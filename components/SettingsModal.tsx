@@ -119,27 +119,27 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
               <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-1">
                   Clé d'API Notion (Internal Integration Token)
               </label>
-              <input type="password" id="apiKey" value={apiKey} onChange={e => setApiKey(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" placeholder="secret_..."/>
+              <input type="password" id="apiKey" value={apiKey} onChange={e => setApiKey(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C] bg-white text-gray-900 placeholder:text-gray-500" placeholder="secret_..."/>
             </div>
 
             {/* Clients Database */}
             <div className="p-4 border rounded-lg">
                 <div className="flex items-center mb-4">
-                  <UserIcon className="w-5 h-5 mr-2 text-indigo-600" />
+                  <UserIcon className="w-5 h-5 mr-2 text-[#8A003C]" />
                   <h3 className="text-lg font-semibold">Base de Données Clients</h3>
                 </div>
                 <div className="space-y-4">
                     <div>
                         <label htmlFor="clientDbId" className="block text-sm font-medium text-gray-700 mb-1">ID de la Base de Données</label>
-                        <input type="text" id="clientDbId" value={clientDbId} onChange={e => setClientDbId(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <input type="text" id="clientDbId" value={clientDbId} onChange={e => setClientDbId(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" />
                     </div>
                     <div>
                         <label htmlFor="nameColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Nom'</label>
-                        <input type="text" id="nameColumn" value={nameColumn} onChange={e => setNameColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <input type="text" id="nameColumn" value={nameColumn} onChange={e => setNameColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" />
                     </div>
                     <div>
                         <label htmlFor="phoneColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Téléphone'</label>
-                        <input type="text" id="phoneColumn" value={phoneColumn} onChange={e => setPhoneColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <input type="text" id="phoneColumn" value={phoneColumn} onChange={e => setPhoneColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" />
                     </div>
                 </div>
             </div>
@@ -153,15 +153,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
                 <div className="space-y-4">
                     <div>
                         <label htmlFor="templateDbId" className="block text-sm font-medium text-gray-700 mb-1">ID de la Base de Données</label>
-                        <input type="text" id="templateDbId" value={templateDbId} onChange={e => setTemplateDbId(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" placeholder="Laisser vide pour utiliser les modèles par défaut" />
+                        <input type="text" id="templateDbId" value={templateDbId} onChange={e => setTemplateDbId(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C] placeholder:text-gray-500" placeholder="Laisser vide pour utiliser les modèles par défaut" />
                     </div>
                     <div>
                         <label htmlFor="titleColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Titre'</label>
-                        <input type="text" id="titleColumn" value={titleColumn} onChange={e => setTitleColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <input type="text" id="titleColumn" value={titleColumn} onChange={e => setTitleColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" />
                     </div>
                     <div>
                         <label htmlFor="contentColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Contenu'</label>
-                        <input type="text" id="contentColumn" value={contentColumn} onChange={e => setContentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <input type="text" id="contentColumn" value={contentColumn} onChange={e => setContentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" />
                     </div>
                 </div>
             </div>

@@ -166,7 +166,7 @@ const App: React.FC = () => {
         <div className="relative flex flex-col w-full md:w-1/2 lg:w-2/5 xl:w-1/3 min-h-screen border-r border-gray-200">
           <div className="flex-grow p-4 sm:p-8 pb-24 overflow-y-auto">
               <header className="text-center mb-10">
-                  <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-teal-500 to-green-400">
+                  <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#8C0343] via-[#FF0175] to-[#FFCCE4]">
                       Gestionnaire SMS
                   </h1>
                   <p className="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">
@@ -193,19 +193,19 @@ const App: React.FC = () => {
 
           <footer className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 shadow-t-lg">
               <nav className="max-w-4xl mx-auto px-4 flex justify-around items-center h-16">
-                  <button onClick={() => goToStep(Step.SELECT_CLIENT)} className="flex flex-col items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors w-24" aria-label="Accueil">
+                  <button onClick={() => goToStep(Step.SELECT_CLIENT)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-label="Accueil">
                       <HomeIcon className="w-7 h-7" />
                       <span className="text-xs font-medium">Accueil</span>
                   </button>
-                  <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors w-24">
+                  <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24">
                       <MailIcon className="w-7 h-7" />
                       <span className="text-xs font-medium">Mail</span>
                   </a>
-                  <a href={`notion://www.notion.so/${templateDbId.replace(/-/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors w-24" aria-disabled={!templateDbId}>
+                  <a href={`notion://www.notion.so/${templateDbId.replace(/-/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-disabled={!templateDbId}>
                       <DocumentTextIcon className="w-7 h-7" />
                       <span className="text-xs font-medium">Modèles</span>
                   </a>
-                  <button onClick={() => setIsSettingsOpen(true)} className="flex flex-col items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors w-24" aria-label="Réglages">
+                  <button onClick={() => setIsSettingsOpen(true)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-label="Réglages">
                       <SettingsIcon className="w-7 h-7" />
                       <span className="text-xs font-medium">Réglages</span>
                   </button>
@@ -239,17 +239,17 @@ const App: React.FC = () => {
                         <div className="mt-8 space-y-4 text-left">
                            
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">1</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">1</div>
                                 <div className="flex-grow">
                                     <button onClick={() => handleDashboardCopy(phoneNumber, 'phone')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
                                         <span className="font-semibold">Copier le numéro</span>
-                                        {phoneCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                                        {phoneCopied ? <span className="font-bold text-[#8A003C]">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
                                     </button>
                                 </div>
                             </div>
                            
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">2</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">2</div>
                                 <div className="flex-grow">
                                     <button onClick={handleOpenOnoff} className="w-full flex items-center justify-between p-4 rounded-lg bg-black text-white hover:bg-gray-800 transition">
                                         <span className="font-semibold">Ouvrir On/Off</span>
@@ -266,11 +266,11 @@ const App: React.FC = () => {
                             </div>
                            
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">4</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">4</div>
                                 <div className="flex-grow">
                                     <button onClick={() => handleDashboardCopy(message, 'message')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
                                         <span className="font-semibold">Copier le message</span>
-                                        {messageCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                                        {messageCopied ? <span className="font-bold text-[#8A003C]">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
                                     </button>
                                 </div>
                             </div>
@@ -292,7 +292,7 @@ const App: React.FC = () => {
                     </div>
                   ) : (
                     <div className="max-w-md">
-                        <h3 className="text-xl font-bold text-gray-800">Interface On/Off</h3>
+                        <h3 className="text-xl font-bold text-[#8A003C]">Interface On/Off</h3>
                         <p className="mt-2 text-gray-600">
                             Pour des raisons de sécurité, On/Off ne peut pas être intégré directement.
                         </p>

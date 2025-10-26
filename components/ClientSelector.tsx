@@ -64,7 +64,7 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({ onSelectClient }) => {
           placeholder="Rechercher un client..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C] transition bg-white text-gray-900 placeholder:text-gray-500"
         />
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           {loading ? <SpinnerIcon className="w-5 h-5 text-gray-400" /> : <SearchIcon className="text-gray-400" />}
@@ -82,10 +82,10 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({ onSelectClient }) => {
           <div
             key={client.id}
             onClick={() => onSelectClient(client)}
-            className="flex items-center p-4 bg-white rounded-xl shadow-sm border border-transparent hover:border-indigo-500 hover:shadow-lg cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1"
+            className="flex items-center p-4 bg-white rounded-xl shadow-sm border border-transparent hover:border-[#8A003C] hover:shadow-lg cursor-pointer transition-all duration-300 ease-in-out transform hover:-translate-y-1"
           >
-            <div className="p-3 bg-indigo-100 rounded-full mr-4">
-              <UserIcon className="w-6 h-6 text-indigo-600" />
+            <div className="p-3 bg-[#8A003C] rounded-full mr-4">
+              <UserIcon className="w-6 h-6 text-white" />
             </div>
             <div>
               <p className="font-semibold text-lg text-gray-800">{client.name}</p>
