@@ -145,18 +145,18 @@ const App: React.FC = () => {
         );
       case Step.COMPOSE:
         return (
-          <Composer
-            phoneNumber={phoneNumber}
-            message={message}
-            onPhoneNumberChange={setPhoneNumber}
-            onMessageChange={setMessage}
-            onBack={() => goToStep(Step.SELECT_TEMPLATE)}
-          />
+          selectedClient && (
+            <Composer
+              client={selectedClient}
+              message={message}
+              onBack={() => goToStep(Step.SELECT_TEMPLATE)}
+            />
+          )
         );
       default:
         return null;
     }
-  }, [step, selectedClient, phoneNumber, message, templates]);
+  }, [step, selectedClient, message, templates]);
 
   return (
     <div className="w-full min-h-screen font-sans text-gray-900 bg-slate-100 flex justify-center">
@@ -232,32 +232,40 @@ const App: React.FC = () => {
               <div className="flex-grow flex flex-col justify-center items-center p-8 text-center">
                   {step === Step.COMPOSE ? (
                     <div className="w-full max-w-md">
-                        <h3 className="text-2xl font-bold text-gray-800">Prêt à envoyer !</h3>
+                        <h3 className="text-2xl font-bold text-gray-800">Plan d'action pour l'envoi</h3>
                         <p className="mt-2 text-gray-600">
-                            Suivez ces 3 étapes pour un envoi rapide et sans erreur.
+                            Suivez ces étapes dans l'ordre pour envoyer votre message.
                         </p>
                         <div className="mt-8 space-y-4 text-left">
-                            <button
-                                onClick={() => handleDashboardCopy(phoneNumber, 'phone')}
-                                className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
-                            >
-                                <span className="font-semibold"><span className="text-indigo-600 font-bold">1.</span> Copier le numéro</span>
-                                {phoneCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
-                            </button>
-                            <button
-                                onClick={() => handleDashboardCopy(message, 'message')}
-                                className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
-                            >
-                                <span className="font-semibold"><span className="text-teal-600 font-bold">2.</span> Copier le message</span>
-                                {messageCopied ? <span className="font-bold text-teal-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
-                            </button>
-                             <button
-                                onClick={handleOpenOnoff}
-                                className="w-full flex items-center justify-between p-4 rounded-lg bg-black text-white hover:bg-gray-800 transition"
-                            >
-                                <span className="font-semibold"><span className="text-green-400 font-bold">3.</span> Ouvrir On/Off</span>
-                                <ExternalLinkIcon className="w-5 h-5" />
-                            </button>
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">1</div>
+                                <div className="flex-grow">
+                                    <button onClick={() => handleDashboardCopy(phoneNumber, 'phone')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+                                        <span className="font-semibold">Copier le numéro</span>
+                                        {phoneCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">2</div>
+                                <div className="flex-grow">
+                                    <button onClick={handleOpenOnoff} className="w-full flex items-center justify-between p-4 rounded-lg bg-black text-white hover:bg-gray-800 transition">
+                                        <span className="font-semibold">Ouvrir On/Off</span>
+                                        <ExternalLinkIcon className="w-5 h-5" />
+                                    </button>
+                                    <p className="text-xs text-gray-500 mt-1 pl-1">Dans On/Off, cliquez sur "Nouveau Message" et collez le numéro.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">3</div>
+                                <div className="flex-grow">
+                                    <button onClick={() => handleDashboardCopy(message, 'message')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+                                        <span className="font-semibold">Copier le message</span>
+                                        {messageCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                                    </button>
+                                    <p className="text-xs text-gray-500 mt-1 pl-1">Collez le message dans la zone de texte, puis envoyez.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                   ) : (
