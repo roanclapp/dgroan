@@ -21,6 +21,9 @@ const App: React.FC = () => {
   const [notionError, setNotionError] = useState<string | null>(null);
 
   const [templateDbId, setTemplateDbId] = useState('');
+  
+  const [phoneCopied, setPhoneCopied] = useState(false);
+  const [messageCopied, setMessageCopied] = useState(false);
 
   const loadNotionTemplates = useCallback(async () => {
     const savedApiKey = localStorage.getItem('notionApiKey');
@@ -98,14 +101,31 @@ const App: React.FC = () => {
   const goToStep = (targetStep: Step) => {
     if (targetStep === Step.SELECT_CLIENT) {
         setSelectedClient(null);
+        setPhoneCopied(false);
+        setMessageCopied(false);
     }
     setStep(targetStep);
   }
 
+  const handleDashboardCopy = (text: string, type: 'phone' | 'message') => {
+    navigator.clipboard.writeText(text).then(() => {
+      if (type === 'phone') {
+        setPhoneCopied(true);
+        setTimeout(() => setPhoneCopied(false), 2000);
+      } else {
+        setMessageCopied(true);
+        setTimeout(() => setMessageCopied(false), 2000);
+      }
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+      alert("Erreur lors de la copie.");
+    });
+  };
+
   const stepTitles = [
     "Étape 1: Recherchez un client",
     "Étape 2: Choisissez un modèle de SMS",
-    "Étape 3: Vérifiez et copiez"
+    "Étape 3: Finalisez l'envoi"
   ];
 
   const CurrentStepComponent = useMemo(() => {
@@ -193,7 +213,7 @@ const App: React.FC = () => {
           </footer>
         </div>
         
-        {/* Right Column: Fake Browser */}
+        {/* Right Column: Interactive Panel */}
         <div className="hidden md:flex flex-col flex-grow bg-gray-100 p-4">
           <div className="flex-grow flex flex-col bg-white rounded-lg shadow-inner border border-gray-300">
               <div className="flex items-center p-2 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
@@ -204,28 +224,53 @@ const App: React.FC = () => {
                   </div>
                   <div className="flex-grow mx-4">
                       <div className="w-full bg-gray-200 rounded-full px-4 py-1 text-sm text-gray-600 truncate">
-                          https://phone.onoff.app/messages
+                          Panneau de Contrôle On/Off
                       </div>
                   </div>
               </div>
 
               <div className="flex-grow flex flex-col justify-center items-center p-8 text-center">
-                  <div className="max-w-md">
-                      <h3 className="text-xl font-bold text-gray-800">Interface On/Off</h3>
-                      <p className="mt-2 text-gray-600">
-                          Pour des raisons de sécurité, l'application On/Off ne peut pas être intégrée directement ici.
-                      </p>
-                      <p className="mt-4 text-sm text-gray-500">
-                          Utilisez les boutons <ClipboardCopyIcon className="w-4 h-4 inline-block mx-1" /> dans le panneau de gauche pour copier les informations, puis cliquez ci-dessous.
-                      </p>
-                      <button
-                          onClick={handleOpenOnoff}
-                          className="mt-8 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-transform transform hover:scale-105"
-                      >
-                          <ExternalLinkIcon className="w-5 h-5 mr-2" />
-                          Ouvrir On/Off dans une nouvelle fenêtre
-                      </button>
-                  </div>
+                  {step === Step.COMPOSE ? (
+                    <div className="w-full max-w-md">
+                        <h3 className="text-2xl font-bold text-gray-800">Prêt à envoyer !</h3>
+                        <p className="mt-2 text-gray-600">
+                            Suivez ces 3 étapes pour un envoi rapide et sans erreur.
+                        </p>
+                        <div className="mt-8 space-y-4 text-left">
+                            <button
+                                onClick={() => handleDashboardCopy(phoneNumber, 'phone')}
+                                className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                            >
+                                <span className="font-semibold"><span className="text-indigo-600 font-bold">1.</span> Copier le numéro</span>
+                                {phoneCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                            </button>
+                            <button
+                                onClick={() => handleDashboardCopy(message, 'message')}
+                                className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                            >
+                                <span className="font-semibold"><span className="text-teal-600 font-bold">2.</span> Copier le message</span>
+                                {messageCopied ? <span className="font-bold text-teal-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                            </button>
+                             <button
+                                onClick={handleOpenOnoff}
+                                className="w-full flex items-center justify-between p-4 rounded-lg bg-black text-white hover:bg-gray-800 transition"
+                            >
+                                <span className="font-semibold"><span className="text-green-400 font-bold">3.</span> Ouvrir On/Off</span>
+                                <ExternalLinkIcon className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                  ) : (
+                    <div className="max-w-md">
+                        <h3 className="text-xl font-bold text-gray-800">Interface On/Off</h3>
+                        <p className="mt-2 text-gray-600">
+                            Pour des raisons de sécurité, On/Off ne peut pas être intégré directement.
+                        </p>
+                        <p className="mt-4 text-sm text-gray-500">
+                            Ce panneau deviendra votre tableau de bord d'envoi lorsque vous arriverez à la dernière étape.
+                        </p>
+                    </div>
+                  )}
               </div>
           </div>
         </div>
