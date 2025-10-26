@@ -237,6 +237,7 @@ const App: React.FC = () => {
                             Suivez ces étapes dans l'ordre pour envoyer votre message.
                         </p>
                         <div className="mt-8 space-y-4 text-left">
+                           
                             <div className="flex items-start space-x-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">1</div>
                                 <div className="flex-grow">
@@ -246,6 +247,7 @@ const App: React.FC = () => {
                                     </button>
                                 </div>
                             </div>
+                           
                             <div className="flex items-start space-x-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">2</div>
                                 <div className="flex-grow">
@@ -253,17 +255,37 @@ const App: React.FC = () => {
                                         <span className="font-semibold">Ouvrir On/Off</span>
                                         <ExternalLinkIcon className="w-5 h-5" />
                                     </button>
-                                    <p className="text-xs text-gray-500 mt-1 pl-1">Dans On/Off, cliquez sur "Nouveau Message" et collez le numéro.</p>
                                 </div>
                             </div>
+
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">3</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">3</div>
+                                <div className="flex-grow pt-3">
+                                    <p className="text-sm text-gray-600">Dans On/Off, cliquez sur "Nouveau Message" puis collez le numéro.</p>
+                                </div>
+                            </div>
+                           
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">4</div>
                                 <div className="flex-grow">
                                     <button onClick={() => handleDashboardCopy(message, 'message')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
                                         <span className="font-semibold">Copier le message</span>
                                         {messageCopied ? <span className="font-bold text-indigo-600">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
                                     </button>
-                                    <p className="text-xs text-gray-500 mt-1 pl-1">Collez le message dans la zone de texte, puis envoyez.</p>
+                                </div>
+                            </div>
+                           
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">5</div>
+                                <div className="flex-grow pt-3">
+                                    <p className="text-sm text-gray-600">Collez le message dans la zone de texte.</p>
+                                </div>
+                            </div>
+
+                             <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">6</div>
+                                <div className="flex-grow pt-3">
+                                    <p className="text-sm text-gray-600">Envoyez !</p>
                                 </div>
                             </div>
                         </div>
