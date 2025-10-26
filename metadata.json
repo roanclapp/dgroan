@@ -1,0 +1,5 @@
+{
+  "name": "Gestionnaire SMS Client",
+  "description": "Une application pour sélectionner des clients depuis un annuaire et leur envoyer des modèles de SMS pré-définis via l'application on/off.",
+  "requestFramePermissions": []
+}
