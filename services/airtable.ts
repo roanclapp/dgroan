@@ -6,18 +6,56 @@ interface AirtableRecord {
     createdTime: string;
 }
 
-const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, phoneColumn: string): Client | null => {
-    const name = record.fields[nameColumn];
-    const phone = record.fields[phoneColumn];
+const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, phoneColumn: string, dateColumn?: string, hourColumn?: string): Client | null => {
+    let name = record.fields[nameColumn];
+    let phone = record.fields[phoneColumn];
 
-    if (typeof name === 'string' && typeof phone === 'string') {
-        return {
-            id: record.id,
-            name,
-            phone,
-        };
+    // Gérer les champs de type Lookup/Rollup qui retournent des tableaux
+    if (Array.isArray(name) && name.length > 0) {
+        name = name[0];
     }
-    return null;
+    if (Array.isArray(phone) && phone.length > 0) {
+        phone = phone[0];
+    }
+
+    if (typeof name !== 'string' || typeof phone !== 'string' || !name || !phone) {
+        console.warn(`Enregistrement Airtable ignoré ${record.id}: nom ou téléphone invalide/manquant.`, { name, phone });
+        return null;
+    }
+
+    let appointmentTime: string | undefined = undefined;
+
+    // Priorité 1: Colonne Heure dédiée
+    if (hourColumn && record.fields[hourColumn]) {
+        let hourValue = record.fields[hourColumn];
+        if (Array.isArray(hourValue) && hourValue.length > 0) {
+            hourValue = hourValue[0];
+        }
+
+        if (typeof hourValue === 'string' && hourValue.trim() !== '') {
+            appointmentTime = hourValue;
+        } else if (typeof hourValue === 'number') {
+            appointmentTime = String(hourValue);
+        }
+    }
+    
+    // Priorité 2: Extraire l'heure depuis la colonne de date si non trouvée
+    if (!appointmentTime && dateColumn && record.fields[dateColumn]) {
+        const dateValue = record.fields[dateColumn];
+        if (typeof dateValue === 'string' && dateValue.includes('T')) {
+            const date = new Date(dateValue);
+            if (!isNaN(date.getTime())) {
+                appointmentTime = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false });
+            }
+        }
+    }
+
+    return {
+        id: record.id,
+        name,
+        phone,
+        appointmentTime,
+    };
 };
 
 const mapAirtableRecordToTemplate = (record: AirtableRecord, titleColumn: string, contentColumn: string): Template | null => {
@@ -118,5 +156,40 @@ export const fetchAirtableTemplates = async (
 ): Promise<Template[]> => {
     return fetchPaginatedFromAirtable(pat, baseId, tableName, 
         (record) => mapAirtableRecordToTemplate(record, titleColumn, contentColumn)
+    );
+};
+
+export const fetchAirtableAppointmentsForTomorrow = async (
+    pat: string,
+    baseId: string,
+    tableName: string,
+    dateColumn: string,
+    nameColumn: string,
+    phoneColumn: string,
+    hourColumn?: string
+): Promise<Client[]> => {
+    // Ne filtre plus par date, en supposant que la vue Airtable est déjà filtrée.
+    // La colonne de date est passée pour extraire l'heure du rendez-vous.
+    return fetchPaginatedFromAirtable(pat, baseId, tableName, 
+        (record) => mapAirtableRecordToClient(record, nameColumn, phoneColumn, dateColumn, hourColumn)
+    );
+};
+
+export const fetchAirtableNoShowsForToday = async (
+    pat: string,
+    baseId: string,
+    tableName: string,
+    dateColumn: string,
+    nameColumn: string,
+    phoneColumn: string,
+    hourColumn: string | undefined,
+    statusColumn: string,
+    noShowStatus: string
+): Promise<Client[]> => {
+    const filterFormula = `AND(IS_SAME({${dateColumn}}, TODAY(), 'day'), {${statusColumn}} = "${noShowStatus}")`;
+
+    return fetchPaginatedFromAirtable(pat, baseId, tableName,
+        (record) => mapAirtableRecordToClient(record, nameColumn, phoneColumn, dateColumn, hourColumn),
+        filterFormula
     );
 };

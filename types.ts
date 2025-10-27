@@ -5,6 +5,7 @@ export interface Client {
   id: string;
   name: string;
   phone: string;
+  appointmentTime?: string;
 }
 
 export interface Template {
@@ -17,4 +18,5 @@ export enum Step {
   SELECT_CLIENT,
   SELECT_TEMPLATE,
   COMPOSE,
+  NO_SHOWS,
 }

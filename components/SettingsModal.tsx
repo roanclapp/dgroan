@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CloseIcon, NotionIcon, DocumentTextIcon, UserIcon, AirtableIcon } from './IconComponents';
+import { CloseIcon, NotionIcon, DocumentTextIcon, UserIcon, AirtableIcon, CalendarIcon } from './IconComponents';
 import { DataSource } from '../types';
 
 interface SettingsModalProps {
@@ -20,6 +20,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
   const [notionTemplateDbId, setNotionTemplateDbId] = useState('');
   const [notionTitleColumn, setNotionTitleColumn] = useState('');
   const [notionContentColumn, setNotionContentColumn] = useState('');
+  const [notionAppointmentDbId, setNotionAppointmentDbId] = useState('');
+  const [notionAppointmentDateColumn, setNotionAppointmentDateColumn] = useState('');
+  const [notionAppointmentHourColumn, setNotionAppointmentHourColumn] = useState('');
+  const [notionAppointmentNameColumn, setNotionAppointmentNameColumn] = useState('');
+  const [notionAppointmentPhoneColumn, setNotionAppointmentPhoneColumn] = useState('');
+  const [notionAppointmentStatusColumn, setNotionAppointmentStatusColumn] = useState('');
+  const [notionAppointmentNoShowStatus, setNotionAppointmentNoShowStatus] = useState('');
+
 
   // Airtable State
   const [airtablePat, setAirtablePat] = useState('');
@@ -30,6 +38,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
   const [airtableTemplateTable, setAirtableTemplateTable] = useState('');
   const [airtableTemplateTitle, setAirtableTemplateTitle] = useState('');
   const [airtableTemplateContent, setAirtableTemplateContent] = useState('');
+  const [airtableAppointmentTable, setAirtableAppointmentTable] = useState('');
+  const [airtableAppointmentDateColumn, setAirtableAppointmentDateColumn] = useState('');
+  const [airtableAppointmentHourColumn, setAirtableAppointmentHourColumn] = useState('');
+  const [airtableAppointmentNameColumn, setAirtableAppointmentNameColumn] = useState('');
+  const [airtableAppointmentPhoneColumn, setAirtableAppointmentPhoneColumn] = useState('');
+  const [airtableAppointmentStatusColumn, setAirtableAppointmentStatusColumn] = useState('');
+  const [airtableAppointmentNoShowStatus, setAirtableAppointmentNoShowStatus] = useState('');
+
 
   const [isConnected, setIsConnected] = useState(false);
 
@@ -47,6 +63,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
       setNotionTemplateDbId(localStorage.getItem('notionTemplateDbId') || '2981710a6a09807abb22dbc5c5f7a1a5');
       setNotionTitleColumn(localStorage.getItem('notionTitleColumn') || 'Titre');
       setNotionContentColumn(localStorage.getItem('notionContentColumn') || 'Contenu');
+      setNotionAppointmentDbId(localStorage.getItem('notionAppointmentDbId') || '13a1710a6a0980afa6dbd9dfd6634016');
+      setNotionAppointmentDateColumn(localStorage.getItem('notionAppointmentDateColumn') || 'Date 📅');
+      setNotionAppointmentHourColumn(localStorage.getItem('notionAppointmentHourColumn') || 'Formule heure');
+      setNotionAppointmentNameColumn(localStorage.getItem('notionAppointmentNameColumn') || 'Agrégation nom client');
+      setNotionAppointmentPhoneColumn(localStorage.getItem('notionAppointmentPhoneColumn') || 'Téléphone');
+      setNotionAppointmentStatusColumn(localStorage.getItem('notionAppointmentStatusColumn') || 'Formule pas venu');
+      setNotionAppointmentNoShowStatus(localStorage.getItem('notionAppointmentNoShowStatus') || 'Pas venu');
+
 
       // Load Airtable settings
       const savedAirtablePat = localStorage.getItem('airtablePat');
@@ -58,6 +82,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
       setAirtableTemplateTable(localStorage.getItem('airtableTemplateTable') || '');
       setAirtableTemplateTitle(localStorage.getItem('airtableTemplateTitle') || 'Title');
       setAirtableTemplateContent(localStorage.getItem('airtableTemplateContent') || 'Content');
+      setAirtableAppointmentTable(localStorage.getItem('airtableAppointmentTable') || '');
+      setAirtableAppointmentDateColumn(localStorage.getItem('airtableAppointmentDateColumn') || 'Date');
+      setAirtableAppointmentHourColumn(localStorage.getItem('airtableAppointmentHourColumn') || 'Formule heure');
+      setAirtableAppointmentNameColumn(localStorage.getItem('airtableAppointmentNameColumn') || 'Client Name');
+      setAirtableAppointmentPhoneColumn(localStorage.getItem('airtableAppointmentPhoneColumn') || 'Téléphone');
+      setAirtableAppointmentStatusColumn(localStorage.getItem('airtableAppointmentStatusColumn') || 'Statut');
+      setAirtableAppointmentNoShowStatus(localStorage.getItem('airtableAppointmentNoShowStatus') || 'Pas venu');
       
       setIsConnected(!!(savedDataSource === 'notion' ? savedNotionKey : savedAirtablePat));
     }
@@ -79,6 +110,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
       localStorage.setItem('notionTemplateDbId', notionTemplateDbId);
       localStorage.setItem('notionTitleColumn', notionTitleColumn);
       localStorage.setItem('notionContentColumn', notionContentColumn);
+      localStorage.setItem('notionAppointmentDbId', notionAppointmentDbId);
+      localStorage.setItem('notionAppointmentDateColumn', notionAppointmentDateColumn);
+      localStorage.setItem('notionAppointmentHourColumn', notionAppointmentHourColumn);
+      localStorage.setItem('notionAppointmentNameColumn', notionAppointmentNameColumn);
+      localStorage.setItem('notionAppointmentPhoneColumn', notionAppointmentPhoneColumn);
+      localStorage.setItem('notionAppointmentStatusColumn', notionAppointmentStatusColumn);
+      localStorage.setItem('notionAppointmentNoShowStatus', notionAppointmentNoShowStatus);
       connectionValid = true;
     } else if (dataSource === 'airtable') {
         if (!airtablePat.trim() || !airtableBaseId.trim() || !airtableClientTable.trim() || !airtableClientName.trim() || !airtableClientPhone.trim()) {
@@ -93,6 +131,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
         localStorage.setItem('airtableTemplateTable', airtableTemplateTable);
         localStorage.setItem('airtableTemplateTitle', airtableTemplateTitle);
         localStorage.setItem('airtableTemplateContent', airtableTemplateContent);
+        localStorage.setItem('airtableAppointmentTable', airtableAppointmentTable);
+        localStorage.setItem('airtableAppointmentDateColumn', airtableAppointmentDateColumn);
+        localStorage.setItem('airtableAppointmentHourColumn', airtableAppointmentHourColumn);
+        localStorage.setItem('airtableAppointmentNameColumn', airtableAppointmentNameColumn);
+        localStorage.setItem('airtableAppointmentPhoneColumn', airtableAppointmentPhoneColumn);
+        localStorage.setItem('airtableAppointmentStatusColumn', airtableAppointmentStatusColumn);
+        localStorage.setItem('airtableAppointmentNoShowStatus', airtableAppointmentNoShowStatus);
         connectionValid = true;
     }
 
@@ -104,10 +149,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
   };
 
   const handleDisconnect = () => {
+    const notionKeys = ['notionApiKey', 'notionClientDbId', 'notionNameColumn', 'notionPhoneColumn', 'notionTemplateDbId', 'notionTitleColumn', 'notionContentColumn', 'notionAppointmentDbId', 'notionAppointmentDateColumn', 'notionAppointmentHourColumn', 'notionAppointmentNameColumn', 'notionAppointmentPhoneColumn', 'notionAppointmentStatusColumn', 'notionAppointmentNoShowStatus'];
+    const airtableKeys = ['airtablePat', 'airtableBaseId', 'airtableClientTable', 'airtableClientName', 'airtableClientPhone', 'airtableTemplateTable', 'airtableTemplateTitle', 'airtableTemplateContent', 'airtableAppointmentTable', 'airtableAppointmentDateColumn', 'airtableAppointmentHourColumn', 'airtableAppointmentNameColumn', 'airtableAppointmentPhoneColumn', 'airtableAppointmentStatusColumn', 'airtableAppointmentNoShowStatus'];
+    
     if (dataSource === 'notion') {
-      ['notionApiKey', 'notionClientDbId', 'notionNameColumn', 'notionPhoneColumn', 'notionTemplateDbId', 'notionTitleColumn', 'notionContentColumn'].forEach(key => localStorage.removeItem(key));
+        notionKeys.forEach(key => localStorage.removeItem(key));
     } else if (dataSource === 'airtable') {
-      ['airtablePat', 'airtableBaseId', 'airtableClientTable', 'airtableClientName', 'airtableClientPhone', 'airtableTemplateTable', 'airtableTemplateTitle', 'airtableTemplateContent'].forEach(key => localStorage.removeItem(key));
+        airtableKeys.forEach(key => localStorage.removeItem(key));
     }
     
     setIsConnected(false);
@@ -178,6 +226,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
                         <div><label htmlFor="contentColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Contenu'</label><input type="text" id="contentColumn" value={notionContentColumn} onChange={e => setNotionContentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                     </div>
                 </div>
+                 {/* Notion Appointments DB */}
+                <div className="p-4 border rounded-lg">
+                    <div className="flex items-center mb-4"><CalendarIcon className="w-5 h-5 mr-2 text-blue-600" /><h3 className="text-lg font-semibold">Base de Données Rendez-vous <span className="text-sm font-normal text-gray-500">(Optionnel)</span></h3></div>
+                    <div className="space-y-4">
+                        <div><label htmlFor="appointmentDbId" className="block text-sm font-medium text-gray-700 mb-1">ID de la Base de Données</label><input type="text" id="appointmentDbId" value={notionAppointmentDbId} onChange={e => setNotionAppointmentDbId(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentDateColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Date'</label><input type="text" id="appointmentDateColumn" value={notionAppointmentDateColumn} onChange={e => setNotionAppointmentDateColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentHourColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Heure' (Texte ou Formule)</label><input type="text" id="appointmentHourColumn" value={notionAppointmentHourColumn} onChange={e => setNotionAppointmentHourColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentNameColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Nom Client' (Relation ou Rollup)</label><input type="text" id="appointmentNameColumn" value={notionAppointmentNameColumn} onChange={e => setNotionAppointmentNameColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentPhoneColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Téléphone Client' (Rollup)</label><input type="text" id="appointmentPhoneColumn" value={notionAppointmentPhoneColumn} onChange={e => setNotionAppointmentPhoneColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentStatusColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Statut' (Select, Formule, etc.)</label><input type="text" id="appointmentStatusColumn" value={notionAppointmentStatusColumn} onChange={e => setNotionAppointmentStatusColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentNoShowStatus" className="block text-sm font-medium text-gray-700 mb-1">Valeur du statut pour "Pas Venu"</label><input type="text" id="appointmentNoShowStatus" value={notionAppointmentNoShowStatus} onChange={e => setNotionAppointmentNoShowStatus(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                    </div>
+                </div>
               </>
             )}
             {dataSource === 'airtable' && (
@@ -206,6 +267,19 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
                         <div><label htmlFor="airtableTemplateTable" className="block text-sm font-medium text-gray-700 mb-1">Nom de la Table</label><input type="text" id="airtableTemplateTable" value={airtableTemplateTable} onChange={e => setAirtableTemplateTable(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" placeholder="Laisser vide pour utiliser les modèles par défaut" /></div>
                         <div><label htmlFor="airtableTemplateTitle" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Titre'</label><input type="text" id="airtableTemplateTitle" value={airtableTemplateTitle} onChange={e => setAirtableTemplateTitle(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="airtableTemplateContent" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Contenu'</label><input type="text" id="airtableTemplateContent" value={airtableTemplateContent} onChange={e => setAirtableTemplateContent(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                    </div>
+                </div>
+                {/* Airtable Appointments Table */}
+                <div className="p-4 border rounded-lg">
+                    <div className="flex items-center mb-4"><CalendarIcon className="w-5 h-5 mr-2 text-blue-600" /><h3 className="text-lg font-semibold">Table Rendez-vous <span className="text-sm font-normal text-gray-500">(Optionnel)</span></h3></div>
+                    <div className="space-y-4">
+                        <div><label htmlFor="airtableAppointmentTable" className="block text-sm font-medium text-gray-700 mb-1">Nom de la Table</label><input type="text" id="airtableAppointmentTable" value={airtableAppointmentTable} onChange={e => setAirtableAppointmentTable(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentDate" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Date'</label><input type="text" id="airtableAppointmentDate" value={airtableAppointmentDateColumn} onChange={e => setAirtableAppointmentDateColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentHour" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Heure'</label><input type="text" id="airtableAppointmentHour" value={airtableAppointmentHourColumn} onChange={e => setAirtableAppointmentHourColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentName" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Nom Client'</label><input type="text" id="airtableAppointmentName" value={airtableAppointmentNameColumn} onChange={e => setAirtableAppointmentNameColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentPhone" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Téléphone Client'</label><input type="text" id="airtableAppointmentPhone" value={airtableAppointmentPhoneColumn} onChange={e => setAirtableAppointmentPhoneColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentStatus" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Statut'</label><input type="text" id="airtableAppointmentStatus" value={airtableAppointmentStatusColumn} onChange={e => setAirtableAppointmentStatusColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentNoShowStatus" className="block text-sm font-medium text-gray-700 mb-1">Valeur du statut pour "Pas Venu"</label><input type="text" id="airtableAppointmentNoShowStatus" value={airtableAppointmentNoShowStatus} onChange={e => setAirtableAppointmentNoShowStatus(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                     </div>
                 </div>
               </>

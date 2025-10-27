@@ -5,13 +5,15 @@ import ClientSelector from './components/ClientSelector';
 import TemplateSelector from './components/TemplateSelector';
 import Composer from './components/Composer';
 import SettingsModal from './components/SettingsModal';
-import { HomeIcon, SettingsIcon, NotionIcon, SpinnerIcon, DocumentTextIcon, MailIcon, ExternalLinkIcon, ClipboardCopyIcon } from './components/IconComponents';
+import NoShowSelector from './components/NoShowSelector';
+import { HomeIcon, SettingsIcon, NotionIcon, SpinnerIcon, DocumentTextIcon, MailIcon, ExternalLinkIcon, ClipboardCopyIcon, NoShowIcon, OnOffIcon } from './components/IconComponents';
 import { fetchNotionTemplates } from './services/notion';
 import { fetchAirtableTemplates } from './services/airtable';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<Step>(Step.SELECT_CLIENT);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectionContext, setSelectionContext] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -95,8 +97,9 @@ const App: React.FC = () => {
     setExternalDbName('Modèles');
   };
 
-  const handleSelectClient = (client: Client) => {
+  const handleSelectClient = (client: Client, context?: string) => {
     setSelectedClient(client);
+    setSelectionContext(context || null);
     setStep(Step.SELECT_TEMPLATE);
   };
 
@@ -127,10 +130,11 @@ const App: React.FC = () => {
   };
 
   const goToStep = (targetStep: Step) => {
-    if (targetStep === Step.SELECT_CLIENT) {
+    if (targetStep === Step.SELECT_CLIENT || targetStep === Step.NO_SHOWS) {
         setSelectedClient(null);
         setPhoneCopied(false);
         setMessageCopied(false);
+        setSelectionContext(null);
     }
     setStep(targetStep);
   }
@@ -181,8 +185,21 @@ const App: React.FC = () => {
   const stepTitles = [
     "Étape 1: Recherchez un client",
     "Étape 2: Choisissez un modèle de SMS",
-    "Étape 3: Finalisez l'envoi"
+    "Étape 3: Finalisez l'envoi",
+    "Clients absents du jour"
   ];
+  
+  const filteredTemplates = useMemo(() => {
+    if (selectionContext === 'appointmentConfirmation') {
+      const allowedTitles = ["Rappel de Rendez-vous", "Demande de Prépaiement ⚠️"];
+      return templates.filter(t => allowedTitles.includes(t.title));
+    }
+    if (selectionContext === 'noShow') {
+      const allowedTitles = ["⛔️ Pas venu", "Demande de Prépaiement ⚠️"];
+      return templates.filter(t => allowedTitles.includes(t.title));
+    }
+    return templates;
+  }, [templates, selectionContext]);
 
   const CurrentStepComponent = useMemo(() => {
     switch (step) {
@@ -192,7 +209,7 @@ const App: React.FC = () => {
         return (
           selectedClient && (
             <TemplateSelector
-              templates={templates}
+              templates={filteredTemplates}
               selectedClient={selectedClient}
               onSelectTemplate={handleSelectTemplate}
               onBack={() => goToStep(Step.SELECT_CLIENT)}
@@ -209,10 +226,12 @@ const App: React.FC = () => {
             />
           )
         );
+      case Step.NO_SHOWS:
+        return <NoShowSelector onSelectClient={handleSelectClient} />;
       default:
         return null;
     }
-  }, [step, selectedClient, message, templates]);
+  }, [step, selectedClient, message, filteredTemplates]);
   
   const NavLinks = () => (
     <>
@@ -220,10 +239,18 @@ const App: React.FC = () => {
           <HomeIcon className="w-7 h-7" />
           <span className="text-xs font-medium mt-1">Accueil</span>
       </button>
+      <button onClick={handleOpenOnoff} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100" aria-label="Ouvrir On/Off">
+          <OnOffIcon className="w-7 h-7" />
+          <span className="text-xs font-medium mt-1">On/Off</span>
+      </button>
       <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100">
           <MailIcon className="w-7 h-7" />
           <span className="text-xs font-medium mt-1">Mail</span>
       </a>
+      <button onClick={() => goToStep(Step.NO_SHOWS)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100" aria-label="Clients absents">
+          <NoShowIcon className="w-7 h-7" />
+          <span className="text-xs font-medium mt-1">Pas Venu</span>
+      </button>
       <a href={externalDbLink} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100" aria-disabled={externalDbLink === '#'}>
           <DocumentTextIcon className="w-7 h-7" />
           <span className="text-xs font-medium mt-1">{externalDbName}</span>
@@ -251,7 +278,10 @@ const App: React.FC = () => {
                   <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#8C0343] via-[#FF0175] to-[#FFCCE4]">
                       Gestionnaire SMS
                   </h1>
-                  <p className="mt-2 text-lg text-gray-600 max-w-2xl mx-auto">
+                   <p className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#8C0343] via-[#FF0175] to-[#FFCCE4] tracking-wider mt-1">
+                        0460 21 55 57
+                   </p>
+                  <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
                       {stepTitles[step]}
                   </p>
               </header>

@@ -1,4 +1,3 @@
-
 import { Client, Template } from './types';
 
 export const CLIENTS: Client[] = [
@@ -29,7 +28,17 @@ export const TEMPLATES: Template[] = [
   },
   {
     id: '4',
-    title: 'Confirmation de rendez-vous',
+    title: 'Rappel de Rendez-vous',
     content: 'Bonjour {clientName}, nous vous confirmons votre rendez-vous pour le [DATE] à [HEURE]. En cas d\'empêchement, merci de nous prévenir. À bientôt !',
+  },
+  {
+    id: '5',
+    title: 'Demande de Prépaiement ⚠️',
+    content: 'Bonjour {clientName}, afin de confirmer votre rendez-vous, un prépaiement est nécessaire. Merci de le régler via ce lien : [LIEN DE PAIEMENT]',
+  },
+  {
+    id: '6',
+    title: '⛔️ Pas venu',
+    content: 'Bonjour {clientName}, nous avons remarqué votre absence à votre rendez-vous d\'aujourd\'hui. Souhaitez-vous que nous en planifions un nouveau ?',
   },
 ];
