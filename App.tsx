@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Client, Template, Step, DataSource } from './types';
 import { CLIENTS, TEMPLATES } from './constants';
 import ClientSelector from './components/ClientSelector';
@@ -25,6 +25,8 @@ const App: React.FC = () => {
 
   const [phoneCopied, setPhoneCopied] = useState(false);
   const [messageCopied, setMessageCopied] = useState(false);
+
+  const onoffWindowRef = useRef<Window | null>(null);
 
   const loadDataFromSource = useCallback(async () => {
     const dataSource = localStorage.getItem('dataSource') as DataSource || 'notion';
@@ -108,7 +110,16 @@ const App: React.FC = () => {
   const handleOpenOnoff = () => {
     const onoffUrl = "https://phone.onoff.app/messages";
     const windowFeatures = "width=800,height=900,resizable=yes,scrollbars=yes";
-    window.open(onoffUrl, 'onoffWindow', windowFeatures);
+    const win = window.open(onoffUrl, 'onoffWindow', windowFeatures);
+    onoffWindowRef.current = win;
+  };
+
+  const handleFocusOnoff = () => {
+    if (onoffWindowRef.current && !onoffWindowRef.current.closed) {
+      onoffWindowRef.current.focus();
+    } else {
+      handleOpenOnoff();
+    }
   };
 
   const goToStep = (targetStep: Step) => {
@@ -198,12 +209,39 @@ const App: React.FC = () => {
         return null;
     }
   }, [step, selectedClient, message, templates]);
+  
+  const NavLinks = () => (
+    <>
+      <button onClick={() => goToStep(Step.SELECT_CLIENT)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100" aria-label="Accueil">
+          <HomeIcon className="w-7 h-7" />
+          <span className="text-xs font-medium mt-1">Accueil</span>
+      </button>
+      <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100">
+          <MailIcon className="w-7 h-7" />
+          <span className="text-xs font-medium mt-1">Mail</span>
+      </a>
+      <a href={externalDbLink} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100" aria-disabled={externalDbLink === '#'}>
+          <DocumentTextIcon className="w-7 h-7" />
+          <span className="text-xs font-medium mt-1">{externalDbName}</span>
+      </a>
+      <button onClick={() => setIsSettingsOpen(true)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24 py-2 rounded-lg hover:bg-slate-100" aria-label="Réglages">
+          <SettingsIcon className="w-7 h-7" />
+          <span className="text-xs font-medium mt-1">Réglages</span>
+      </button>
+    </>
+  );
 
   return (
     <div className="w-full min-h-screen font-sans text-gray-900 bg-slate-100 flex justify-center">
       <div className="w-full max-w-7xl flex flex-row shadow-2xl bg-white">
         
-        <div className="relative flex flex-col w-full md:w-1/2 lg:w-2/5 xl:w-1/3 min-h-screen border-r border-gray-200">
+        {/* Desktop Vertical Nav */}
+        <nav className="hidden md:flex flex-col items-center justify-start space-y-4 pt-6 bg-white border-r border-gray-200 w-24 flex-shrink-0">
+          <NavLinks />
+        </nav>
+
+        {/* Main content area */}
+        <div className="relative flex flex-col w-full md:w-[440px] flex-shrink-0 min-h-screen border-r border-gray-200">
           <div className="flex-grow p-4 sm:p-8 pb-24 overflow-y-auto">
               <header className="text-center mb-10">
                   <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#8C0343] via-[#FF0175] to-[#FFCCE4]">
@@ -231,24 +269,10 @@ const App: React.FC = () => {
               </main>
           </div>
 
-          <footer className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 shadow-t-lg">
+          {/* Mobile Bottom Nav */}
+          <footer className="md:hidden absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 shadow-t-lg">
               <nav className="max-w-4xl mx-auto px-4 flex justify-around items-center h-16">
-                  <button onClick={() => goToStep(Step.SELECT_CLIENT)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-label="Accueil">
-                      <HomeIcon className="w-7 h-7" />
-                      <span className="text-xs font-medium">Accueil</span>
-                  </button>
-                  <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24">
-                      <MailIcon className="w-7 h-7" />
-                      <span className="text-xs font-medium">Mail</span>
-                  </a>
-                  <a href={externalDbLink} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-disabled={externalDbLink === '#'}>
-                      <DocumentTextIcon className="w-7 h-7" />
-                      <span className="text-xs font-medium">{externalDbName}</span>
-                  </a>
-                  <button onClick={() => setIsSettingsOpen(true)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-label="Réglages">
-                      <SettingsIcon className="w-7 h-7" />
-                      <span className="text-xs font-medium">Réglages</span>
-                  </button>
+                  <NavLinks />
               </nav>
           </footer>
         </div>
@@ -268,7 +292,7 @@ const App: React.FC = () => {
                   </div>
               </div>
 
-              <div className="flex-grow flex flex-col justify-center items-center p-8 text-center">
+              <div className="flex-grow flex flex-col justify-start items-center p-8 text-center pt-6">
                   {step === Step.COMPOSE ? (
                     <div className="w-full max-w-md">
                         <h3 className="text-2xl font-bold text-gray-800">Plan d'action pour l'envoi</h3>
@@ -315,14 +339,24 @@ const App: React.FC = () => {
                             </div>
                            
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">5</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">5</div>
+                                <div className="flex-grow">
+                                    <button onClick={handleFocusOnoff} className="w-full flex items-center justify-between p-4 rounded-lg bg-black text-white hover:bg-gray-800 transition">
+                                        <span className="font-semibold">Retourner sur On/Off</span>
+                                        <ExternalLinkIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">6</div>
                                 <div className="flex-grow pt-3">
                                     <p className="text-sm text-gray-600">Collez le message dans la zone de texte.</p>
                                 </div>
                             </div>
 
                              <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">6</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">7</div>
                                 <div className="flex-grow pt-3">
                                     <p className="text-sm text-gray-600">Envoyez !</p>
                                 </div>
