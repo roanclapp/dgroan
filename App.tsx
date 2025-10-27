@@ -115,9 +115,16 @@ const App: React.FC = () => {
   };
 
   const handleFocusOnoff = () => {
-    if (onoffWindowRef.current && !onoffWindowRef.current.closed) {
+    // If we have a reference, we assume the window is open and just try to focus it.
+    // We are deliberately avoiding checking `onoffWindowRef.current.closed` because
+    // it will fail across different domains (like this app and phone.onoff.app)
+    // due to browser security policies. This failure would incorrectly trigger the
+    // `else` block, causing the window to reload.
+    if (onoffWindowRef.current) {
       onoffWindowRef.current.focus();
     } else {
+      // If there is no reference at all (e.g., our app page was reloaded, or the
+      // initial open failed), then we must open it fresh.
       handleOpenOnoff();
     }
   };
