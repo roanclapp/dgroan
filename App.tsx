@@ -108,7 +108,7 @@ const App: React.FC = () => {
   }
 
   const handleDashboardCopy = (text: string, type: 'phone' | 'message') => {
-    navigator.clipboard.writeText(text).then(() => {
+    const showSuccess = () => {
       if (type === 'phone') {
         setPhoneCopied(true);
         setTimeout(() => setPhoneCopied(false), 2000);
@@ -116,9 +116,46 @@ const App: React.FC = () => {
         setMessageCopied(true);
         setTimeout(() => setMessageCopied(false), 2000);
       }
-    }).catch(err => {
-      console.error('Failed to copy text: ', err);
-      alert("Erreur lors de la copie.");
+    };
+
+    // Fallback function for browsers/iframes that don't support the Clipboard API
+    const fallbackCopy = () => {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      
+      // Make it invisible and out of the way
+      textArea.style.position = "fixed";
+      textArea.style.top = "-9999px";
+      textArea.style.left = "-9999px";
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showSuccess();
+        } else {
+          console.error('Fallback: Unable to copy');
+          alert("La copie a échoué. Veuillez copier le texte manuellement.");
+        }
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+        alert("La copie a échoué. Veuillez copier le texte manuellement.");
+      }
+
+      document.body.removeChild(textArea);
+    };
+
+    // Try modern Clipboard API, then fallback
+    if (!navigator.clipboard) {
+      fallbackCopy();
+      return;
+    }
+    navigator.clipboard.writeText(text).then(showSuccess).catch((err) => {
+      console.warn('navigator.clipboard.writeText failed, trying fallback.', err);
+      fallbackCopy();
     });
   };
 
