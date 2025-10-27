@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Client } from '../types';
+import { Client, DataSource } from '../types';
 import { UserIcon, SearchIcon, SpinnerIcon } from './IconComponents';
 import { searchNotionClients } from '../services/notion';
+import { searchAirtableClients } from '../services/airtable';
 
 interface ClientSelectorProps {
   onSelectClient: (client: Client) => void;
@@ -31,23 +32,40 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({ onSelectClient }) => {
 
     debounceTimeoutRef.current = window.setTimeout(async () => {
       try {
-        const savedApiKey = localStorage.getItem('notionApiKey');
-        const savedClientDbId = localStorage.getItem('notionClientDbId');
-        const savedNameColumn = localStorage.getItem('notionNameColumn');
-        const savedPhoneColumn = localStorage.getItem('notionPhoneColumn');
+        const dataSource = localStorage.getItem('dataSource') as DataSource || 'notion';
+        let clients: Client[] = [];
+        
+        if (dataSource === 'notion') {
+          const savedApiKey = localStorage.getItem('notionApiKey');
+          const savedClientDbId = localStorage.getItem('notionClientDbId');
+          const savedNameColumn = localStorage.getItem('notionNameColumn');
+          const savedPhoneColumn = localStorage.getItem('notionPhoneColumn');
 
-        if (!savedApiKey || !savedClientDbId || !savedNameColumn || !savedPhoneColumn) {
-          throw new Error("Configuration Notion manquante. Veuillez vérifier les réglages.");
+          if (!savedApiKey || !savedClientDbId || !savedNameColumn || !savedPhoneColumn) {
+            throw new Error("Configuration Notion manquante. Veuillez vérifier les réglages.");
+          }
+          clients = await searchNotionClients(savedApiKey, savedClientDbId, savedNameColumn, savedPhoneColumn, searchTerm);
+        
+        } else if (dataSource === 'airtable') {
+            const savedPat = localStorage.getItem('airtablePat');
+            const savedBaseId = localStorage.getItem('airtableBaseId');
+            const savedClientTable = localStorage.getItem('airtableClientTable');
+            const savedClientName = localStorage.getItem('airtableClientName');
+            const savedClientPhone = localStorage.getItem('airtableClientPhone');
+
+            if (!savedPat || !savedBaseId || !savedClientTable || !savedClientName || !savedClientPhone) {
+                throw new Error("Configuration Airtable manquante. Veuillez vérifier les réglages.");
+            }
+            clients = await searchAirtableClients(savedPat, savedBaseId, savedClientTable, savedClientName, savedClientPhone, searchTerm);
         }
 
-        const clients = await searchNotionClients(savedApiKey, savedClientDbId, savedNameColumn, savedPhoneColumn, searchTerm);
         setResults(clients);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Erreur inconnue lors de la recherche.");
       } finally {
         setLoading(false);
       }
-    }, 500); // 500ms debounce delay
+    }, 500);
 
     return () => {
         if (debounceTimeoutRef.current) {

@@ -50,6 +50,16 @@ export const NotionIcon = ({ className = 'w-6 h-6' }: { className?: string }) =>
     </svg>
 );
 
+export const AirtableIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.5333 36.3333L8.66667 27.6667V10.3333L22.5333 19V36.3333Z" fill="#FFC107"></path>
+      <path d="M25.4667 41.6667L8.66667 27.6667L25.4667 13.6667L42.2667 27.6667L25.4667 41.6667Z" fill="#4CAF50"></path>
+      <path d="M28.4 36.3333V19L42.2667 27.6667V10.3333L28.4 19V36.3333Z" fill="#F44336"></path>
+      <path d="M28.4 19L42.2667 10.3333V27.6667L28.4 36.3333V19Z" fill="#2196F3"></path>
+    </svg>
+);
+
+
 export const CloseIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

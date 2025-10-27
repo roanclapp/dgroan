@@ -1,4 +1,6 @@
 
+export type DataSource = 'notion' | 'airtable';
+
 export interface Client {
   id: string;
   name: string;

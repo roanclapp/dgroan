@@ -66,6 +66,7 @@ const fetchPaginatedFromNotion = async (apiKey: string, databaseId: string, mapp
     let hasMore = true;
     let startCursor: string | undefined = undefined;
     let isFirstPage = true;
+    const PROXY_URL = 'https://corsproxy.io/?';
 
     while (hasMore) {
         // Add a delay between requests to avoid rate limiting, except for the first page.
@@ -81,7 +82,8 @@ const fetchPaginatedFromNotion = async (apiKey: string, databaseId: string, mapp
             body.filter = filter;
         }
 
-        const response = await fetch(`https://cors-anywhere.herokuapp.com/https://api.notion.com/v1/databases/${databaseId}/query`, {
+        const NOTION_API_URL = `https://api.notion.com/v1/databases/${databaseId}/query`;
+        const response = await fetch(`${PROXY_URL}${NOTION_API_URL}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
@@ -92,12 +94,25 @@ const fetchPaginatedFromNotion = async (apiKey: string, databaseId: string, mapp
         });
 
         if (!response.ok) {
-            if (response.status === 429) {
-                 throw new Error(`Too Many Requests`);
-            }
             const errorData = await response.json().catch(() => ({ message: response.statusText }));
             console.error('Erreur API Notion:', errorData);
-            throw new Error(`${errorData.message || response.statusText}`);
+
+            let friendlyMessage = `Erreur ${response.status}: ${errorData.message || response.statusText}`;
+            switch(response.status) {
+                case 401:
+                    friendlyMessage = "Clé d'API Notion invalide ou expirée. Veuillez la vérifier dans les Réglages.";
+                    break;
+                case 403:
+                    friendlyMessage = "Accès interdit. Assurez-vous que votre intégration Notion a bien été partagée avec la base de données (via le menu Partager > Inviter).";
+                    break;
+                case 404:
+                    friendlyMessage = "Base de données non trouvée. Vérifiez que l'ID de la base de données est correct dans les Réglages.";
+                    break;
+                case 429:
+                    friendlyMessage = "Trop de requêtes envoyées à Notion. Veuillez patienter un moment avant de réessayer.";
+                    break;
+            }
+            throw new Error(friendlyMessage);
         }
 
         const data = await response.json();

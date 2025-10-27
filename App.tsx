@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Client, Template, Step } from './types';
+import { Client, Template, Step, DataSource } from './types';
 import { CLIENTS, TEMPLATES } from './constants';
 import ClientSelector from './components/ClientSelector';
 import TemplateSelector from './components/TemplateSelector';
@@ -7,6 +7,7 @@ import Composer from './components/Composer';
 import SettingsModal from './components/SettingsModal';
 import { HomeIcon, SettingsIcon, NotionIcon, SpinnerIcon, DocumentTextIcon, MailIcon, ExternalLinkIcon, ClipboardCopyIcon } from './components/IconComponents';
 import { fetchNotionTemplates } from './services/notion';
+import { fetchAirtableTemplates } from './services/airtable';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<Step>(Step.SELECT_CLIENT);
@@ -16,68 +17,80 @@ const App: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const [templates, setTemplates] = useState<Template[]>(TEMPLATES);
+  const [templatesLoading, setTemplatesLoading] = useState<boolean>(false);
+  const [dataError, setDataError] = useState<string | null>(null);
 
-  const [notionTemplatesLoading, setNotionTemplatesLoading] = useState<boolean>(false);
-  const [notionError, setNotionError] = useState<string | null>(null);
+  const [externalDbLink, setExternalDbLink] = useState('#');
+  const [externalDbName, setExternalDbName] = useState('Modèles');
 
-  const [templateDbId, setTemplateDbId] = useState('');
-  
   const [phoneCopied, setPhoneCopied] = useState(false);
   const [messageCopied, setMessageCopied] = useState(false);
 
-  const loadNotionTemplates = useCallback(async () => {
-    const savedApiKey = localStorage.getItem('notionApiKey');
-    const savedTemplateDbId = localStorage.getItem('notionTemplateDbId');
-    const savedTitleColumn = localStorage.getItem('notionTitleColumn');
-    const savedContentColumn = localStorage.getItem('notionContentColumn');
+  const loadDataFromSource = useCallback(async () => {
+    const dataSource = localStorage.getItem('dataSource') as DataSource || 'notion';
+    
+    setTemplatesLoading(true);
+    setDataError(null);
+    setTemplates(TEMPLATES); // Fallback while loading
 
-    if(savedTemplateDbId) setTemplateDbId(savedTemplateDbId);
+    try {
+        let loadedTemplates: Template[] = [];
 
-    if (savedApiKey && savedTemplateDbId && savedTitleColumn && savedContentColumn) {
-      setNotionTemplatesLoading(true);
-      setNotionError(null);
-      try {
-        const notionTemplates = await fetchNotionTemplates(savedApiKey, savedTemplateDbId, savedTitleColumn, savedContentColumn);
-        if (notionTemplates.length > 0) {
-          setTemplates(notionTemplates);
-        } else {
-          setTemplates(TEMPLATES); // Fallback
-           setNotionError("Aucun modèle de SMS trouvé dans Notion. Utilisation des modèles par défaut.");
+        if (dataSource === 'notion') {
+            const savedApiKey = localStorage.getItem('notionApiKey');
+            const savedTemplateDbId = localStorage.getItem('notionTemplateDbId');
+            const savedTitleColumn = localStorage.getItem('notionTitleColumn');
+            const savedContentColumn = localStorage.getItem('notionContentColumn');
+
+            if (savedApiKey && savedTemplateDbId && savedTitleColumn && savedContentColumn) {
+                loadedTemplates = await fetchNotionTemplates(savedApiKey, savedTemplateDbId, savedTitleColumn, savedContentColumn);
+                setExternalDbLink(`notion://www.notion.so/${savedTemplateDbId.replace(/-/g, '')}`);
+                setExternalDbName('Notion');
+            }
+        } else if (dataSource === 'airtable') {
+            const savedPat = localStorage.getItem('airtablePat');
+            const savedBaseId = localStorage.getItem('airtableBaseId');
+            const savedTable = localStorage.getItem('airtableTemplateTable');
+            const savedTitle = localStorage.getItem('airtableTemplateTitle');
+            const savedContent = localStorage.getItem('airtableTemplateContent');
+
+            if (savedPat && savedBaseId && savedTable && savedTitle && savedContent) {
+                loadedTemplates = await fetchAirtableTemplates(savedPat, savedBaseId, savedTable, savedTitle, savedContent);
+                setExternalDbLink(`https://airtable.com/${savedBaseId}`);
+                setExternalDbName('Airtable');
+            }
         }
-      } catch (error) {
+
+        if (loadedTemplates.length > 0) {
+            setTemplates(loadedTemplates);
+        } else {
+            setTemplates(TEMPLATES);
+            setDataError("Aucun modèle trouvé. Utilisation des modèles par défaut.");
+            setExternalDbLink('#');
+            setExternalDbName('Modèles');
+        }
+    } catch (error) {
         console.error("Template fetch error:", error);
         const errorMessage = error instanceof Error ? error.message : "Erreur inconnue.";
-        setNotionError(`Modèles: ${errorMessage}`);
+        setDataError(`Modèles: ${errorMessage}`);
         setTemplates(TEMPLATES);
-      } finally {
-        setNotionTemplatesLoading(false);
-      }
+        setExternalDbLink('#');
+        setExternalDbName('Modèles');
+    } finally {
+        setTemplatesLoading(false);
     }
   }, []);
 
+
   useEffect(() => {
-    const defaultConfig = {
-      notionApiKey: 'ntn_S61914752096psu0xk5XYrFRxzQXZrmp264GP8MVRD26N9',
-      notionClientDbId: '1391710a6a09815fbcebc89f9f503e75',
-      notionNameColumn: 'Clients',
-      notionPhoneColumn: 'Téléphone ☎️',
-      notionTemplateDbId: '2981710a6a09807abb22dbc5c5f7a1a5',
-      notionTitleColumn: 'Titre',
-      notionContentColumn: 'Contenu',
-    };
+    loadDataFromSource();
+  }, [loadDataFromSource]);
 
-    Object.entries(defaultConfig).forEach(([key, value]) => {
-      if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, value);
-      }
-    });
-    
-    loadNotionTemplates();
-  }, [loadNotionTemplates]);
-
-  const handleDisconnectNotion = () => {
+  const handleDisconnect = () => {
     setTemplates(TEMPLATES);
-    setNotionError(null);
+    setDataError(null);
+    setExternalDbLink('#');
+    setExternalDbName('Modèles');
   };
 
   const handleSelectClient = (client: Client) => {
@@ -118,37 +131,28 @@ const App: React.FC = () => {
       }
     };
 
-    // Fallback function for browsers/iframes that don't support the Clipboard API
     const fallbackCopy = () => {
       const textArea = document.createElement("textarea");
       textArea.value = text;
-      
-      // Make it invisible and out of the way
       textArea.style.position = "fixed";
       textArea.style.top = "-9999px";
       textArea.style.left = "-9999px";
-
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
-
       try {
         const successful = document.execCommand('copy');
         if (successful) {
           showSuccess();
         } else {
-          console.error('Fallback: Unable to copy');
           alert("La copie a échoué. Veuillez copier le texte manuellement.");
         }
       } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
         alert("La copie a échoué. Veuillez copier le texte manuellement.");
       }
-
       document.body.removeChild(textArea);
     };
 
-    // Try modern Clipboard API, then fallback
     if (!navigator.clipboard) {
       fallbackCopy();
       return;
@@ -199,7 +203,6 @@ const App: React.FC = () => {
     <div className="w-full min-h-screen font-sans text-gray-900 bg-slate-100 flex justify-center">
       <div className="w-full max-w-7xl flex flex-row shadow-2xl bg-white">
         
-        {/* Left Column: App */}
         <div className="relative flex flex-col w-full md:w-1/2 lg:w-2/5 xl:w-1/3 min-h-screen border-r border-gray-200">
           <div className="flex-grow p-4 sm:p-8 pb-24 overflow-y-auto">
               <header className="text-center mb-10">
@@ -212,16 +215,16 @@ const App: React.FC = () => {
               </header>
 
               <main className="w-full">
-                  {notionTemplatesLoading && (
+                  {templatesLoading && (
                       <div className="flex justify-center items-center p-8">
                           <SpinnerIcon className="w-8 h-8 text-indigo-600 mr-3" />
                           <p className="text-gray-600 text-lg">Chargement des modèles...</p>
                       </div>
                   )}
-                  {notionError && (
+                  {dataError && (
                       <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg relative mb-6 max-w-2xl mx-auto" role="alert">
-                          <p className="font-bold">Erreur de connexion à Notion</p>
-                          <pre className="whitespace-pre-wrap">{notionError}</pre>
+                          <p className="font-bold">Erreur de connexion</p>
+                          <pre className="whitespace-pre-wrap">{dataError}</pre>
                       </div>
                   )}
                   {CurrentStepComponent}
@@ -238,9 +241,9 @@ const App: React.FC = () => {
                       <MailIcon className="w-7 h-7" />
                       <span className="text-xs font-medium">Mail</span>
                   </a>
-                  <a href={`notion://www.notion.so/${templateDbId.replace(/-/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-disabled={!templateDbId}>
+                  <a href={externalDbLink} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-disabled={externalDbLink === '#'}>
                       <DocumentTextIcon className="w-7 h-7" />
-                      <span className="text-xs font-medium">Modèles</span>
+                      <span className="text-xs font-medium">{externalDbName}</span>
                   </a>
                   <button onClick={() => setIsSettingsOpen(true)} className="flex flex-col items-center justify-center text-[#8A003C] hover:text-[#FF0175] transition-colors w-24" aria-label="Réglages">
                       <SettingsIcon className="w-7 h-7" />
@@ -250,7 +253,6 @@ const App: React.FC = () => {
           </footer>
         </div>
         
-        {/* Right Column: Interactive Panel */}
         <div className="hidden md:flex flex-col flex-grow bg-gray-100 p-4">
           <div className="flex-grow flex flex-col bg-white rounded-lg shadow-inner border border-gray-300">
               <div className="flex items-center p-2 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
@@ -347,8 +349,8 @@ const App: React.FC = () => {
       <SettingsModal 
           isOpen={isSettingsOpen} 
           onClose={() => setIsSettingsOpen(false)}
-          onConnect={loadNotionTemplates}
-          onDisconnect={handleDisconnectNotion}
+          onConnect={loadDataFromSource}
+          onDisconnect={handleDisconnect}
       />
     </div>
   );
