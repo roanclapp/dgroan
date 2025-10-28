@@ -35,6 +35,10 @@ const getPlainTextFromProp = (prop: any): string | null => {
         case 'rollup':
             const array = prop.rollup?.array;
             if (!array || array.length === 0) return null;
+            // Handle array of different types within rollup
+            if (array[0].type === 'rich_text' || array[0].type === 'title') {
+                 return array.map((item: any) => getPlainTextFromProp(item)).join(', ');
+            }
             return getPlainTextFromProp(array[0]);
         case 'number':
              return prop.number !== null ? String(prop.number) : null;
@@ -72,16 +76,14 @@ const mapNotionPageToClient = (page: NotionPage, nameColumn: string, phoneColumn
 };
 
 /**
- * Mappe une page de RDV Notion à un objet Client, en gérant les Rollups et en extrayant l'heure.
- * Version robuste avec parseur récursif.
+ * Mappe une page de RDV Notion à un objet Client, en gérant les Rollups et en extrayant l'heure, les animaux, et le statut SMS.
  */
-const mapNotionAppointmentToClient = (page: NotionPage, dateColumn: string, nameColumn: string, phoneColumn: string, hourColumn: string): Client | null => {
+const mapNotionAppointmentToClient = (page: NotionPage, nameColumn: string, phoneColumn: string, hourColumn: string, petsColumn: string, smsSentColumn: string, noShowSmsSentColumn: string): Client | null => {
   try {
     const name = getPlainTextFromProp(page.properties[nameColumn]);
     const phone = getPlainTextFromProp(page.properties[phoneColumn]);
 
     if (!name || !phone) {
-        // Log utile pour le débogage si une page est ignorée
         console.warn(`Page de RDV ignorée ${page.id}: nom ou téléphone manquant.`, { 
             name: name, 
             phone: phone, 
@@ -93,19 +95,15 @@ const mapNotionAppointmentToClient = (page: NotionPage, dateColumn: string, name
     
     let appointmentTime: string | undefined = undefined;
     
-    // Priorité 1: Récupérer l'heure depuis la colonne dédiée
     if (hourColumn) {
         appointmentTime = getPlainTextFromProp(page.properties[hourColumn]) ?? undefined;
     }
-    
-    // Priorité 2: Extraire l'heure depuis la colonne de date si non trouvée
-    const dateProp = page.properties[dateColumn];
-    if (!appointmentTime && dateProp?.type === 'date' && dateProp.date?.start && dateProp.date.start.includes('T')) {
-        const startDate = new Date(dateProp.date.start);
-        appointmentTime = startDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false });
-    }
 
-    return { id: page.id, name, phone, appointmentTime };
+    const pets = petsColumn ? getPlainTextFromProp(page.properties[petsColumn]) ?? undefined : undefined;
+    const smsSent = smsSentColumn ? page.properties[smsSentColumn]?.checkbox ?? false : false;
+    const noShowSmsSent = noShowSmsSentColumn ? page.properties[noShowSmsSentColumn]?.checkbox ?? false : false;
+
+    return { id: page.id, name, phone, appointmentTime, pets, smsSent, noShowSmsSent };
   } catch (error) {
     console.error('Erreur de mappage (Appointment):', page.id, error);
     return null;
@@ -237,13 +235,11 @@ export const fetchNotionTemplates = async (apiKey: string, databaseId: string, t
     return fetchPaginatedFromNotion(apiKey, databaseId, (page) => mapNotionPageToTemplate(page, titleColumn, contentColumn));
 };
 
-export const fetchNotionAppointmentsForTomorrow = async (apiKey: string, databaseId: string, dateColumn: string, nameColumn: string, phoneColumn: string, hourColumn: string): Promise<Client[]> => {
-    // Calcule la date de demain
+export const fetchNotionAppointmentsForTomorrow = async (apiKey: string, databaseId: string, dateColumn: string, nameColumn: string, phoneColumn: string, hourColumn: string, petsColumn: string, smsSentColumn: string): Promise<Client[]> => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowISO = tomorrow.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    const tomorrowISO = tomorrow.toISOString().split('T')[0];
 
-    // Crée un filtre pour l'API Notion pour ne récupérer que les pages où la date est demain
     const filter = {
         property: dateColumn,
         date: {
@@ -251,16 +247,13 @@ export const fetchNotionAppointmentsForTomorrow = async (apiKey: string, databas
         },
     };
 
-    // Appelle la fonction de récupération paginée avec le filtre
-    return fetchPaginatedFromNotion(apiKey, databaseId, (page) => mapNotionAppointmentToClient(page, dateColumn, nameColumn, phoneColumn, hourColumn), filter);
+    return fetchPaginatedFromNotion(apiKey, databaseId, (page) => mapNotionAppointmentToClient(page, nameColumn, phoneColumn, hourColumn, petsColumn, smsSentColumn, ''), filter);
 };
 
-export const fetchNotionNoShowsForToday = async (apiKey: string, databaseId: string, dateColumn: string, nameColumn: string, phoneColumn: string, hourColumn: string, statusColumn: string, noShowStatus: string): Promise<Client[]> => {
+export const fetchNotionNoShowsForToday = async (apiKey: string, databaseId: string, dateColumn: string, nameColumn: string, phoneColumn: string, hourColumn: string, statusColumn: string, noShowStatus: string, petsColumn: string, smsSentColumn: string, noShowSmsSentColumn: string): Promise<Client[]> => {
     const today = new Date();
     const todayISO = today.toISOString().split('T')[0];
 
-    // L'API Notion ne peut pas filtrer sur les champs de formule.
-    // Nous récupérons donc tous les RDV du jour et nous filtrons côté client.
     const filter = {
         property: dateColumn,
         date: {
@@ -269,7 +262,7 @@ export const fetchNotionNoShowsForToday = async (apiKey: string, databaseId: str
     };
 
     const mapper = (page: NotionPage) => {
-        const client = mapNotionAppointmentToClient(page, dateColumn, nameColumn, phoneColumn, hourColumn);
+        const client = mapNotionAppointmentToClient(page, nameColumn, phoneColumn, hourColumn, petsColumn, smsSentColumn, noShowSmsSentColumn);
         const statusValue = getPlainTextFromProp(page.properties[statusColumn]);
         return { client, statusValue };
     };
@@ -281,4 +274,33 @@ export const fetchNotionNoShowsForToday = async (apiKey: string, databaseId: str
         .map(item => item.client);
 
     return noShowClients as Client[];
+};
+
+export const updateNotionCheckbox = async (apiKey: string, pageId: string, propertyName: string, isChecked: boolean): Promise<void> => {
+  const PROXY_URL = 'https://corsproxy.io/?';
+  const NOTION_API_URL = `https://api.notion.com/v1/pages/${pageId}`;
+  
+  const body = {
+    properties: {
+      [propertyName]: {
+        checkbox: isChecked,
+      },
+    },
+  };
+
+  const response = await fetch(`${PROXY_URL}${NOTION_API_URL}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+    console.error('Erreur API Notion (Update):', errorData);
+    throw new Error(`Erreur lors de la mise à jour de Notion: ${errorData.message || response.statusText}`);
+  }
 };

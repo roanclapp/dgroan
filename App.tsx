@@ -6,7 +6,7 @@ import TemplateSelector from './components/TemplateSelector';
 import Composer from './components/Composer';
 import SettingsModal from './components/SettingsModal';
 import NoShowSelector from './components/NoShowSelector';
-import { HomeIcon, SettingsIcon, NotionIcon, SpinnerIcon, DocumentTextIcon, MailIcon, ExternalLinkIcon, ClipboardCopyIcon, NoShowIcon, OnOffIcon } from './components/IconComponents';
+import { HomeIcon, SettingsIcon, NotionIcon, SpinnerIcon, DocumentTextIcon, MailIcon, ExternalLinkIcon, ClipboardCopyIcon, NoShowIcon, OnOffIcon, StreamDeckIcon } from './components/IconComponents';
 import { fetchNotionTemplates } from './services/notion';
 import { fetchAirtableTemplates } from './services/airtable';
 
@@ -223,6 +223,7 @@ const App: React.FC = () => {
               client={selectedClient}
               message={message}
               onBack={() => goToStep(Step.SELECT_TEMPLATE)}
+              context={selectionContext}
             />
           )
         );
@@ -231,7 +232,7 @@ const App: React.FC = () => {
       default:
         return null;
     }
-  }, [step, selectedClient, message, filteredTemplates]);
+  }, [step, selectedClient, message, filteredTemplates, selectionContext]);
   
   const NavLinks = () => (
     <>
@@ -335,16 +336,18 @@ const App: React.FC = () => {
                         </p>
                         <div className="mt-8 space-y-4 text-left">
                            
+                            {/* Etape 1: Copier le message */}
                             <div className="flex items-start space-x-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">1</div>
                                 <div className="flex-grow">
-                                    <button onClick={() => handleDashboardCopy(phoneNumber, 'phone')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
-                                        <span className="font-semibold">Copier le numéro</span>
-                                        {phoneCopied ? <span className="font-bold text-[#8A003C]">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
+                                    <button onClick={() => handleDashboardCopy(message, 'message')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
+                                        <span className="font-semibold">Copier le message</span>
+                                        {messageCopied ? <span className="font-bold text-[#8A003C]">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
                                     </button>
                                 </div>
                             </div>
                            
+                            {/* Etape 2: Ouvrir On/Off */}
                             <div className="flex items-start space-x-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">2</div>
                                 <div className="flex-grow">
@@ -355,44 +358,33 @@ const App: React.FC = () => {
                                 </div>
                             </div>
 
+                            {/* Etape 3: Ecrire le numéro */}
                             <div className="flex items-start space-x-4">
                                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">3</div>
                                 <div className="flex-grow pt-3">
-                                    <p className="text-sm text-gray-600">Dans On/Off, cliquez sur "Nouveau Message" puis collez le numéro.</p>
+                                    <p className="text-sm text-gray-600 leading-relaxed">
+                                        Dans On/Off, cliquez sur "Nouveau Message" puis écrivez le numéro de téléphone dans la zone "Entrez un nom ou numéro".
+                                    </p>
                                 </div>
                             </div>
                            
+                            {/* Etape 4: Coller le message */}
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">4</div>
-                                <div className="flex-grow">
-                                    <button onClick={() => handleDashboardCopy(message, 'message')} className="w-full flex items-center justify-between p-4 rounded-lg bg-gray-100 hover:bg-gray-200 transition">
-                                        <span className="font-semibold">Copier le message</span>
-                                        {messageCopied ? <span className="font-bold text-[#8A003C]">Copié !</span> : <ClipboardCopyIcon className="w-5 h-5 text-gray-500" />}
-                                    </button>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">4</div>
+                                <div className="flex-grow pt-3">
+                                    <p className="text-sm text-gray-600 leading-relaxed">
+                                        Collez ensuite le message dans la zone "Ecrire un message" (en appuyant sur la touche "Coller" sur le cartouchier <StreamDeckIcon className="w-5 h-5 inline-block align-middle ml-1" />).
+                                    </p>
                                 </div>
                             </div>
                            
+                            {/* Etape 5: Envoyer */}
                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#8A003C] text-white flex items-center justify-center font-bold">5</div>
-                                <div className="flex-grow">
-                                    <button onClick={handleFocusOnoff} className="w-full flex items-center justify-between p-4 rounded-lg bg-black text-white hover:bg-gray-800 transition">
-                                        <span className="font-semibold">Retourner sur On/Off</span>
-                                        <ExternalLinkIcon className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">6</div>
+                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">5</div>
                                 <div className="flex-grow pt-3">
-                                    <p className="text-sm text-gray-600">Collez le message dans la zone de texte.</p>
-                                </div>
-                            </div>
-
-                             <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold">7</div>
-                                <div className="flex-grow pt-3">
-                                    <p className="text-sm text-gray-600">Envoyez !</p>
+                                    <p className="text-sm text-gray-600 leading-relaxed">
+                                        Envoyez le message en cliquant sur le bouton (ou en appuyant sur la touche "Envoyer" sur le cartouchier <StreamDeckIcon className="w-5 h-5 inline-block align-middle ml-1" />).
+                                    </p>
                                 </div>
                             </div>
                         </div>

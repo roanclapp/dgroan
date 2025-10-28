@@ -51,9 +51,12 @@ const NoShowSelector: React.FC<NoShowSelectorProps> = ({ onSelectClient }) => {
             const hourCol = localStorage.getItem('notionAppointmentHourColumn') || '';
             const statusCol = localStorage.getItem('notionAppointmentStatusColumn');
             const noShowStatus = localStorage.getItem('notionAppointmentNoShowStatus');
+            const petsCol = localStorage.getItem('notionAppointmentPetsColumn') || '';
+            const smsSentCol = localStorage.getItem('notionAppointmentSmsSentColumn') || '';
+            const noShowSmsSentCol = localStorage.getItem('notionAppointmentNoShowSmsSentColumn') || '';
             
             if (apiKey && dbId && dateCol && nameCol && phoneCol && statusCol && noShowStatus) {
-                fetchedNoShows = await fetchNotionNoShowsForToday(apiKey, dbId, dateCol, nameCol, phoneCol, hourCol, statusCol, noShowStatus);
+                fetchedNoShows = await fetchNotionNoShowsForToday(apiKey, dbId, dateCol, nameCol, phoneCol, hourCol, statusCol, noShowStatus, petsCol, smsSentCol, noShowSmsSentCol);
             } else {
                 setLoading(false);
                 setError("Configuration des rendez-vous manquante. Veuillez vérifier les réglages.");
@@ -69,9 +72,12 @@ const NoShowSelector: React.FC<NoShowSelectorProps> = ({ onSelectClient }) => {
             const hourCol = localStorage.getItem('airtableAppointmentHourColumn') || '';
             const statusCol = localStorage.getItem('airtableAppointmentStatusColumn');
             const noShowStatus = localStorage.getItem('airtableAppointmentNoShowStatus');
-            
+            const petsCol = localStorage.getItem('airtableAppointmentPetsColumn') || '';
+            const smsSentCol = localStorage.getItem('airtableAppointmentSmsSentColumn') || '';
+            const noShowSmsSentCol = localStorage.getItem('airtableAppointmentNoShowSmsSentColumn') || '';
+
             if (pat && baseId && table && dateCol && nameCol && phoneCol && statusCol && noShowStatus) {
-                fetchedNoShows = await fetchAirtableNoShowsForToday(pat, baseId, table, dateCol, nameCol, phoneCol, hourCol, statusCol, noShowStatus);
+                fetchedNoShows = await fetchAirtableNoShowsForToday(pat, baseId, table, dateCol, nameCol, phoneCol, hourCol, statusCol, noShowStatus, petsCol, smsSentCol, noShowSmsSentCol);
             } else {
                 setLoading(false);
                 setError("Configuration des rendez-vous manquante. Veuillez vérifier les réglages.");

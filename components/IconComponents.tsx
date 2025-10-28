@@ -121,3 +121,18 @@ export const NoShowIcon = ({ className = 'w-6 h-6' }: { className?: string }) =>
     <path strokeLinecap="round" strokeLinejoin="round" d="M14.5 14.5l-5-5m0 5l5-5" />
   </svg>
 );
+
+export const StreamDeckIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
+        <line x1="9" y1="5" x2="9" y2="19"></line>
+        <line x1="15" y1="5" x2="15" y2="19"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+    </svg>
+);
+
+export const PetIcon = ({ className = 'w-5 h-5' }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 10.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zm5.5-1c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-11 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5.5 8c-2.49 0-4.5-2.01-4.5-4.5S9.51 8.5 12 8.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>
+    </svg>
+);

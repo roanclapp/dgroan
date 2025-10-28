@@ -33,9 +33,11 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({ onSelectClient }) => {
             const nameCol = localStorage.getItem('notionAppointmentNameColumn');
             const phoneCol = localStorage.getItem('notionAppointmentPhoneColumn');
             const hourCol = localStorage.getItem('notionAppointmentHourColumn') || '';
+            const petsCol = localStorage.getItem('notionAppointmentPetsColumn') || '';
+            const smsSentCol = localStorage.getItem('notionAppointmentSmsSentColumn') || '';
             
             if (apiKey && dbId && dateCol && nameCol && phoneCol) {
-                fetchedAppointments = await fetchNotionAppointmentsForTomorrow(apiKey, dbId, dateCol, nameCol, phoneCol, hourCol);
+                fetchedAppointments = await fetchNotionAppointmentsForTomorrow(apiKey, dbId, dateCol, nameCol, phoneCol, hourCol, petsCol, smsSentCol);
             } else {
                 setAppointmentsLoading(false);
                 return;
@@ -48,9 +50,11 @@ const ClientSelector: React.FC<ClientSelectorProps> = ({ onSelectClient }) => {
             const nameCol = localStorage.getItem('airtableAppointmentNameColumn');
             const phoneCol = localStorage.getItem('airtableAppointmentPhoneColumn');
             const hourCol = localStorage.getItem('airtableAppointmentHourColumn') || '';
+            const petsCol = localStorage.getItem('airtableAppointmentPetsColumn') || '';
+            const smsSentCol = localStorage.getItem('airtableAppointmentSmsSentColumn') || '';
             
             if (pat && baseId && table && dateCol && nameCol && phoneCol) {
-                fetchedAppointments = await fetchAirtableAppointmentsForTomorrow(pat, baseId, table, dateCol, nameCol, phoneCol, hourCol);
+                fetchedAppointments = await fetchAirtableAppointmentsForTomorrow(pat, baseId, table, dateCol, nameCol, phoneCol, hourCol, petsCol, smsSentCol);
             } else {
                 setAppointmentsLoading(false);
                 return;

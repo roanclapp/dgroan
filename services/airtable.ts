@@ -6,7 +6,7 @@ interface AirtableRecord {
     createdTime: string;
 }
 
-const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, phoneColumn: string, dateColumn?: string, hourColumn?: string): Client | null => {
+const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, phoneColumn: string, dateColumn?: string, hourColumn?: string, petsColumn?: string, smsSentColumn?: string, noShowSmsSentColumn?: string): Client | null => {
     let name = record.fields[nameColumn];
     let phone = record.fields[phoneColumn];
 
@@ -25,7 +25,6 @@ const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, p
 
     let appointmentTime: string | undefined = undefined;
 
-    // Priorité 1: Colonne Heure dédiée
     if (hourColumn && record.fields[hourColumn]) {
         let hourValue = record.fields[hourColumn];
         if (Array.isArray(hourValue) && hourValue.length > 0) {
@@ -39,7 +38,6 @@ const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, p
         }
     }
     
-    // Priorité 2: Extraire l'heure depuis la colonne de date si non trouvée
     if (!appointmentTime && dateColumn && record.fields[dateColumn]) {
         const dateValue = record.fields[dateColumn];
         if (typeof dateValue === 'string' && dateValue.includes('T')) {
@@ -50,11 +48,28 @@ const mapAirtableRecordToClient = (record: AirtableRecord, nameColumn: string, p
         }
     }
 
+    let pets: string | undefined = undefined;
+    if (petsColumn && record.fields[petsColumn]) {
+        let petsValue = record.fields[petsColumn];
+        if (Array.isArray(petsValue)) {
+            petsValue = petsValue.join(', ');
+        }
+        if (typeof petsValue === 'string' && petsValue.trim() !== '') {
+            pets = petsValue;
+        }
+    }
+
+    const smsSent = smsSentColumn ? !!record.fields[smsSentColumn] : false;
+    const noShowSmsSent = noShowSmsSentColumn ? !!record.fields[noShowSmsSentColumn] : false;
+
     return {
         id: record.id,
         name,
         phone,
         appointmentTime,
+        pets,
+        smsSent,
+        noShowSmsSent,
     };
 };
 
@@ -166,12 +181,12 @@ export const fetchAirtableAppointmentsForTomorrow = async (
     dateColumn: string,
     nameColumn: string,
     phoneColumn: string,
-    hourColumn?: string
+    hourColumn: string | undefined,
+    petsColumn: string | undefined,
+    smsSentColumn: string | undefined,
 ): Promise<Client[]> => {
-    // Ne filtre plus par date, en supposant que la vue Airtable est déjà filtrée.
-    // La colonne de date est passée pour extraire l'heure du rendez-vous.
     return fetchPaginatedFromAirtable(pat, baseId, tableName, 
-        (record) => mapAirtableRecordToClient(record, nameColumn, phoneColumn, dateColumn, hourColumn)
+        (record) => mapAirtableRecordToClient(record, nameColumn, phoneColumn, dateColumn, hourColumn, petsColumn, smsSentColumn)
     );
 };
 
@@ -184,12 +199,41 @@ export const fetchAirtableNoShowsForToday = async (
     phoneColumn: string,
     hourColumn: string | undefined,
     statusColumn: string,
-    noShowStatus: string
+    noShowStatus: string,
+    petsColumn: string | undefined,
+    smsSentColumn: string | undefined,
+    noShowSmsSentColumn: string | undefined,
 ): Promise<Client[]> => {
     const filterFormula = `AND(IS_SAME({${dateColumn}}, TODAY(), 'day'), {${statusColumn}} = "${noShowStatus}")`;
 
     return fetchPaginatedFromAirtable(pat, baseId, tableName,
-        (record) => mapAirtableRecordToClient(record, nameColumn, phoneColumn, dateColumn, hourColumn),
+        (record) => mapAirtableRecordToClient(record, nameColumn, phoneColumn, dateColumn, hourColumn, petsColumn, smsSentColumn, noShowSmsSentColumn),
         filterFormula
     );
+};
+
+export const updateAirtableCheckbox = async (pat: string, baseId: string, tableName: string, recordId: string, fieldName: string, isChecked: boolean): Promise<void> => {
+    const PROXY_URL = 'https://corsproxy.io/?';
+    const url = `${PROXY_URL}https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}`;
+
+    const body = {
+        fields: {
+            [fieldName]: isChecked,
+        },
+    };
+
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${pat}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: { message: response.statusText } }));
+        console.error('Erreur API Airtable (Update):', errorData);
+        throw new Error(`Erreur lors de la mise à jour d'Airtable: ${errorData.error?.message || response.statusText}`);
+    }
 };

@@ -27,6 +27,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
   const [notionAppointmentPhoneColumn, setNotionAppointmentPhoneColumn] = useState('');
   const [notionAppointmentStatusColumn, setNotionAppointmentStatusColumn] = useState('');
   const [notionAppointmentNoShowStatus, setNotionAppointmentNoShowStatus] = useState('');
+  const [notionAppointmentPetsColumn, setNotionAppointmentPetsColumn] = useState('');
+  const [notionAppointmentSmsSentColumn, setNotionAppointmentSmsSentColumn] = useState('');
+  const [notionAppointmentNoShowSmsSentColumn, setNotionAppointmentNoShowSmsSentColumn] = useState('');
 
 
   // Airtable State
@@ -45,6 +48,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
   const [airtableAppointmentPhoneColumn, setAirtableAppointmentPhoneColumn] = useState('');
   const [airtableAppointmentStatusColumn, setAirtableAppointmentStatusColumn] = useState('');
   const [airtableAppointmentNoShowStatus, setAirtableAppointmentNoShowStatus] = useState('');
+  const [airtableAppointmentPetsColumn, setAirtableAppointmentPetsColumn] = useState('');
+  const [airtableAppointmentSmsSentColumn, setAirtableAppointmentSmsSentColumn] = useState('');
+  const [airtableAppointmentNoShowSmsSentColumn, setAirtableAppointmentNoShowSmsSentColumn] = useState('');
 
 
   const [isConnected, setIsConnected] = useState(false);
@@ -70,6 +76,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
       setNotionAppointmentPhoneColumn(localStorage.getItem('notionAppointmentPhoneColumn') || 'Téléphone');
       setNotionAppointmentStatusColumn(localStorage.getItem('notionAppointmentStatusColumn') || 'Formule pas venu');
       setNotionAppointmentNoShowStatus(localStorage.getItem('notionAppointmentNoShowStatus') || 'Pas venu');
+      setNotionAppointmentPetsColumn(localStorage.getItem('notionAppointmentPetsColumn') || 'Formule chien');
+      setNotionAppointmentSmsSentColumn(localStorage.getItem('notionAppointmentSmsSentColumn') || 'SMS envoyé');
+      setNotionAppointmentNoShowSmsSentColumn(localStorage.getItem('notionAppointmentNoShowSmsSentColumn') || 'SMS pas venu envoyé');
 
 
       // Load Airtable settings
@@ -89,6 +98,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
       setAirtableAppointmentPhoneColumn(localStorage.getItem('airtableAppointmentPhoneColumn') || 'Téléphone');
       setAirtableAppointmentStatusColumn(localStorage.getItem('airtableAppointmentStatusColumn') || 'Statut');
       setAirtableAppointmentNoShowStatus(localStorage.getItem('airtableAppointmentNoShowStatus') || 'Pas venu');
+      setAirtableAppointmentPetsColumn(localStorage.getItem('airtableAppointmentPetsColumn') || '');
+      setAirtableAppointmentSmsSentColumn(localStorage.getItem('airtableAppointmentSmsSentColumn') || 'SMS envoyé');
+      setAirtableAppointmentNoShowSmsSentColumn(localStorage.getItem('airtableAppointmentNoShowSmsSentColumn') || 'SMS pas venu envoyé');
       
       setIsConnected(!!(savedDataSource === 'notion' ? savedNotionKey : savedAirtablePat));
     }
@@ -117,6 +129,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
       localStorage.setItem('notionAppointmentPhoneColumn', notionAppointmentPhoneColumn);
       localStorage.setItem('notionAppointmentStatusColumn', notionAppointmentStatusColumn);
       localStorage.setItem('notionAppointmentNoShowStatus', notionAppointmentNoShowStatus);
+      localStorage.setItem('notionAppointmentPetsColumn', notionAppointmentPetsColumn);
+      localStorage.setItem('notionAppointmentSmsSentColumn', notionAppointmentSmsSentColumn);
+      localStorage.setItem('notionAppointmentNoShowSmsSentColumn', notionAppointmentNoShowSmsSentColumn);
       connectionValid = true;
     } else if (dataSource === 'airtable') {
         if (!airtablePat.trim() || !airtableBaseId.trim() || !airtableClientTable.trim() || !airtableClientName.trim() || !airtableClientPhone.trim()) {
@@ -138,6 +153,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
         localStorage.setItem('airtableAppointmentPhoneColumn', airtableAppointmentPhoneColumn);
         localStorage.setItem('airtableAppointmentStatusColumn', airtableAppointmentStatusColumn);
         localStorage.setItem('airtableAppointmentNoShowStatus', airtableAppointmentNoShowStatus);
+        localStorage.setItem('airtableAppointmentPetsColumn', airtableAppointmentPetsColumn);
+        localStorage.setItem('airtableAppointmentSmsSentColumn', airtableAppointmentSmsSentColumn);
+        localStorage.setItem('airtableAppointmentNoShowSmsSentColumn', airtableAppointmentNoShowSmsSentColumn);
         connectionValid = true;
     }
 
@@ -149,8 +167,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
   };
 
   const handleDisconnect = () => {
-    const notionKeys = ['notionApiKey', 'notionClientDbId', 'notionNameColumn', 'notionPhoneColumn', 'notionTemplateDbId', 'notionTitleColumn', 'notionContentColumn', 'notionAppointmentDbId', 'notionAppointmentDateColumn', 'notionAppointmentHourColumn', 'notionAppointmentNameColumn', 'notionAppointmentPhoneColumn', 'notionAppointmentStatusColumn', 'notionAppointmentNoShowStatus'];
-    const airtableKeys = ['airtablePat', 'airtableBaseId', 'airtableClientTable', 'airtableClientName', 'airtableClientPhone', 'airtableTemplateTable', 'airtableTemplateTitle', 'airtableTemplateContent', 'airtableAppointmentTable', 'airtableAppointmentDateColumn', 'airtableAppointmentHourColumn', 'airtableAppointmentNameColumn', 'airtableAppointmentPhoneColumn', 'airtableAppointmentStatusColumn', 'airtableAppointmentNoShowStatus'];
+    const notionKeys = ['notionApiKey', 'notionClientDbId', 'notionNameColumn', 'notionPhoneColumn', 'notionTemplateDbId', 'notionTitleColumn', 'notionContentColumn', 'notionAppointmentDbId', 'notionAppointmentDateColumn', 'notionAppointmentHourColumn', 'notionAppointmentNameColumn', 'notionAppointmentPhoneColumn', 'notionAppointmentStatusColumn', 'notionAppointmentNoShowStatus', 'notionAppointmentPetsColumn', 'notionAppointmentSmsSentColumn', 'notionAppointmentNoShowSmsSentColumn'];
+    const airtableKeys = ['airtablePat', 'airtableBaseId', 'airtableClientTable', 'airtableClientName', 'airtableClientPhone', 'airtableTemplateTable', 'airtableTemplateTitle', 'airtableTemplateContent', 'airtableAppointmentTable', 'airtableAppointmentDateColumn', 'airtableAppointmentHourColumn', 'airtableAppointmentNameColumn', 'airtableAppointmentPhoneColumn', 'airtableAppointmentStatusColumn', 'airtableAppointmentNoShowStatus', 'airtableAppointmentPetsColumn', 'airtableAppointmentSmsSentColumn', 'airtableAppointmentNoShowSmsSentColumn'];
     
     if (dataSource === 'notion') {
         notionKeys.forEach(key => localStorage.removeItem(key));
@@ -235,6 +253,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
                         <div><label htmlFor="appointmentHourColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Heure' (Texte ou Formule)</label><input type="text" id="appointmentHourColumn" value={notionAppointmentHourColumn} onChange={e => setNotionAppointmentHourColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="appointmentNameColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Nom Client' (Relation ou Rollup)</label><input type="text" id="appointmentNameColumn" value={notionAppointmentNameColumn} onChange={e => setNotionAppointmentNameColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="appointmentPhoneColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Téléphone Client' (Rollup)</label><input type="text" id="appointmentPhoneColumn" value={notionAppointmentPhoneColumn} onChange={e => setNotionAppointmentPhoneColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentPetsColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Animaux' (Rollup, Formule, Texte)</label><input type="text" id="appointmentPetsColumn" value={notionAppointmentPetsColumn} onChange={e => setNotionAppointmentPetsColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentSmsSentColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'SMS envoyé' (Checkbox)</label><input type="text" id="appointmentSmsSentColumn" value={notionAppointmentSmsSentColumn} onChange={e => setNotionAppointmentSmsSentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="appointmentNoShowSmsSentColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'SMS pas venu envoyé' (Checkbox)</label><input type="text" id="appointmentNoShowSmsSentColumn" value={notionAppointmentNoShowSmsSentColumn} onChange={e => setNotionAppointmentNoShowSmsSentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="appointmentStatusColumn" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Statut' (Select, Formule, etc.)</label><input type="text" id="appointmentStatusColumn" value={notionAppointmentStatusColumn} onChange={e => setNotionAppointmentStatusColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="appointmentNoShowStatus" className="block text-sm font-medium text-gray-700 mb-1">Valeur du statut pour "Pas Venu"</label><input type="text" id="appointmentNoShowStatus" value={notionAppointmentNoShowStatus} onChange={e => setNotionAppointmentNoShowStatus(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                     </div>
@@ -278,6 +299,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onConnec
                         <div><label htmlFor="airtableAppointmentHour" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Heure'</label><input type="text" id="airtableAppointmentHour" value={airtableAppointmentHourColumn} onChange={e => setAirtableAppointmentHourColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="airtableAppointmentName" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Nom Client'</label><input type="text" id="airtableAppointmentName" value={airtableAppointmentNameColumn} onChange={e => setAirtableAppointmentNameColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="airtableAppointmentPhone" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Téléphone Client'</label><input type="text" id="airtableAppointmentPhone" value={airtableAppointmentPhoneColumn} onChange={e => setAirtableAppointmentPhoneColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentPets" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Animaux'</label><input type="text" id="airtableAppointmentPets" value={airtableAppointmentPetsColumn} onChange={e => setAirtableAppointmentPetsColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentSmsSent" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'SMS envoyé' (Checkbox)</label><input type="text" id="airtableAppointmentSmsSent" value={airtableAppointmentSmsSentColumn} onChange={e => setAirtableAppointmentSmsSentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
+                        <div><label htmlFor="airtableAppointmentNoShowSmsSent" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'SMS pas venu envoyé' (Checkbox)</label><input type="text" id="airtableAppointmentNoShowSmsSent" value={airtableAppointmentNoShowSmsSentColumn} onChange={e => setAirtableAppointmentNoShowSmsSentColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="airtableAppointmentStatus" className="block text-sm font-medium text-gray-700 mb-1">Nom de la colonne 'Statut'</label><input type="text" id="airtableAppointmentStatus" value={airtableAppointmentStatusColumn} onChange={e => setAirtableAppointmentStatusColumn(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                         <div><label htmlFor="airtableAppointmentNoShowStatus" className="block text-sm font-medium text-gray-700 mb-1">Valeur du statut pour "Pas Venu"</label><input type="text" id="airtableAppointmentNoShowStatus" value={airtableAppointmentNoShowStatus} onChange={e => setAirtableAppointmentNoShowStatus(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 focus:ring-2 focus:ring-[#8A003C] focus:border-[#8A003C]" /></div>
                     </div>

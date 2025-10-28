@@ -6,6 +6,9 @@ export interface Client {
   name: string;
   phone: string;
   appointmentTime?: string;
+  pets?: string;
+  smsSent?: boolean;
+  noShowSmsSent?: boolean;
 }
 
 export interface Template {
