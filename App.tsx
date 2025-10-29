@@ -105,8 +105,16 @@ const App: React.FC = () => {
 
   const handleSelectTemplate = (template: Template) => {
     if (!selectedClient) return;
+    const formattedMessage = template.content.replace('{clientName}', selectedClient.name);
+    
     setPhoneNumber(selectedClient.phone);
-    setMessage(template.content.replace('{clientName}', selectedClient.name));
+    setMessage(formattedMessage);
+
+    if (selectionContext === 'appointmentConfirmation' || selectionContext === 'noShow') {
+      handleDashboardCopy(formattedMessage, 'message');
+      handleOpenOnoff();
+    }
+    
     setStep(Step.COMPOSE);
   };
   

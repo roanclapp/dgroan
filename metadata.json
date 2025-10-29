@@ -1,5 +1,5 @@
 {
-  "name": "V3 Gestionnaire SMS Client",
+  "name": "V4 Gestionnaire SMS Client",
   "description": "Une application pour sélectionner des clients depuis un annuaire et leur envoyer des modèles de SMS pré-définis via l'application on/off.",
   "requestFramePermissions": []
 }

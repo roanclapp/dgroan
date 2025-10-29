@@ -130,17 +130,19 @@ const Composer: React.FC<ComposerProps> = ({
             <p className="font-semibold text-gray-900">{client.name}</p>
             <div className="flex items-center justify-between mt-1">
               <p className="text-gray-600">{client.phone}</p>
-               <button 
-                onClick={() => handleCopy(client.phone, 'client-phone')} 
-                className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
-                aria-label="Copier le numéro de téléphone"
-              >
-                {copiedItem === 'client-phone' ? (
-                    <span className="text-xs text-[#8A003C] font-bold px-1">Copié!</span>
-                ) : (
-                    <ClipboardCopyIcon className="w-4 h-4 text-gray-500" />
-                )}
-              </button>
+              {context === null && (
+                 <button 
+                  onClick={() => handleCopy(client.phone, 'client-phone')} 
+                  className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
+                  aria-label="Copier le numéro de téléphone"
+                >
+                  {copiedItem === 'client-phone' ? (
+                      <span className="text-xs text-[#8A003C] font-bold px-1">Copié!</span>
+                  ) : (
+                      <ClipboardCopyIcon className="w-4 h-4 text-gray-500" />
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -153,17 +155,6 @@ const Composer: React.FC<ComposerProps> = ({
                     <PetIcon className="w-5 h-5 text-gray-500 mr-2" />
                     <h3 className="text-sm font-medium text-gray-700">Animaux</h3>
                 </div>
-                <button 
-                    onClick={() => handleCopy(client.pets || '', 'pets-content')} 
-                    className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
-                    aria-label="Copier les informations sur les animaux"
-                  >
-                    {copiedItem === 'pets-content' ? (
-                        <span className="text-xs text-[#8A003C] font-bold px-1">Copié!</span>
-                    ) : (
-                        <ClipboardCopyIcon className="w-4 h-4 text-gray-500" />
-                    )}
-                </button>
               </div>
               <div className="p-4 bg-gray-50 rounded-md">
                 <p className="text-gray-800 whitespace-pre-wrap">{client.pets}</p>
@@ -175,7 +166,17 @@ const Composer: React.FC<ComposerProps> = ({
             </div>
           )
         ) : context === 'noShow' ? (
-           null
+           <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center">
+                <MessageIcon className="w-5 h-5 text-gray-500 mr-2" />
+                <h3 className="text-sm font-medium text-gray-700">Message</h3>
+              </div>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-gray-800 whitespace-pre-wrap">{message}</p>
+            </div>
+          </div>
         ) : (
           <div>
             <div className="flex items-center justify-between mb-2">
